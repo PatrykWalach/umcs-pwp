@@ -1,10 +1,15 @@
 from __future__ import annotations
-from email.headerregistry import UniqueAddressHeader
+
 import re
 import typing
-from django.utils.timezone import timedelta, now
+from email.headerregistry import UniqueAddressHeader
+
 import django.db.models as models
 from django.contrib.auth.models import User
+from django.db.models.constraints import UniqueConstraint
+from django.db.models.functions import RowNumber
+from django.urls import reverse
+from django.utils.timezone import now, timedelta
 
 
 class SubTopic(models.Model):
@@ -37,10 +42,6 @@ class SubTopic(models.Model):
         return reverse("topic", kwargs={"topic": self.slug, "topic_pk": self.topic.pk})
 
 
-from django.db.models.constraints import UniqueConstraint
-from django.urls import reverse
-
-
 class Thread(models.Model):
     subtopic = models.ForeignKey(SubTopic, on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=150)
@@ -50,7 +51,6 @@ class Thread(models.Model):
 
     class Meta:
         unique_together = ["slug", "subtopic"]
-        # constraints = [UniqueConstraint(fields=["slug", "subtopic"], name='unique_slug')]
 
     def __str__(self) -> str:
         return f"{str(self.subtopic)}{self.slug}/"
@@ -76,13 +76,18 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        pass
+        get_latest_by = "created_at"
 
     def __str__(self) -> str:
         return str(self.pk)
 
     def get_absolute_url(self):
-        return f"{self.thread.get_absolute_url()}#post-{self.pk}"
+        posts: models.Manager[Post] = self.thread.post_set
+        index = posts.filter(pk__lt=self.pk).count()
+
+        page = index // 10 + 1
+
+        return f"{self.thread.get_absolute_url()}?page={page}#post-{self.pk}"
 
 
 class Profile(models.Model):

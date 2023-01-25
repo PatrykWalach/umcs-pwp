@@ -13,7 +13,7 @@
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
     <div class="bg-base-100/30 grid p-8 gap-4">
-      <div class="text-sm breadcrumbs">
+      <div class="text-sm breadcrumbs ml-8">
         <ul>
           {% for topic in thread.subtopic.path %}
           <li>
@@ -57,7 +57,7 @@
           </div>
         </div>
       </section>
-      {% for post in posts %}
+      {% for post in object_list %}
 
       <div class="card bg-base-100" id="post-{{post.pk}}">
         <div class="card-body">
@@ -75,6 +75,8 @@
         </div>
       </div>
       {% endif %}
+
+ 
 
 
       <div class="card card-compact bg-base-100">

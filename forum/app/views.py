@@ -1,51 +1,24 @@
 from __future__ import annotations
+
 import re
-from django.db import IntegrityError
-
-
 import typing
 from dataclasses import dataclass
-from django.views.generic.base import TemplateView
+
+import django.utils.timezone
 from app.forms import CreatePostForm, CreateThreadForm
 from app.models import Post, SubTopic, Thread
-
-
-@dataclass
-class PageInfo:
-    total_count: int
-    page: int
-    start_page: int = 0
-    paginate = 5
-    per_page = 10
-
-    def end_page(self):
-        return self.total_count // self.per_page
-
-    def pages(self):
-        return range(
-            self.start_page + max(0, self.page - self.paginate - 1),
-            self.start_page + min(self.page + self.paginate, self.end_page()),
-        )
-
-    def start_cursor(self):
-        return (self.page - self.start_page) * self.per_page
-
-    def end_cursor(self):
-        return self.start_cursor() + self.per_page
-
-    def slice(self):
-        return slice(self.start_cursor(), self.end_cursor())
-
-
-from django.db.models import Manager
-from django.core.exceptions import ValidationError
-
-from django.views.generic import CreateView
-
-
 from django import forms
-
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.db import IntegrityError
+from django.db.models import Count, Manager, Max, Model, OuterRef, Q, Subquery
 from django.urls import reverse
+from django.views.generic import CreateView, ListView
+from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
+
+T = typing.TypeVar("T", bound=Model)
 
 
 class ThreadView(CreateView):
@@ -68,15 +41,17 @@ class ThreadView(CreateView):
         thread = Thread.objects.get(slug=self.kwargs["thread"])
         posts: Manager[Post] = thread.post_set
 
-        page_info = PageInfo(
-            page=int(self.request.GET.get("page", 1)),
-            total_count=posts.count(),
-            start_page=1,
-        )
-
         context["thread"] = thread
-        context["page_info"] = page_info
-        context["posts"] = posts.all()[page_info.slice()]
+
+        paginator = Paginator(
+            posts.all(),
+            10,
+        )
+        page = self.request.GET.get("page", 1)
+        context["paginator"] = paginator
+        context["object_list"] = paginator.page(page)
+        context["page"] = page
+
         context["preview"] = {
             "created_at": django.utils.timezone.now(),
             "content": self.request.GET.get("content"),
@@ -86,19 +61,10 @@ class ThreadView(CreateView):
         return context
 
 
-from django.contrib.auth.models import User
-
-
-class UserView(TemplateView):
+class UserView(DetailView):
     template_name = "user.html"
-
-    def get_context_data(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        context = super().get_context_data(**self.kwargs)
-        context["user"] = User.objects.get(username=self.kwargs["username"])
-        return context
-
-
-import django.utils.timezone
+    slug_field = "username"
+    slug_url_kwarg = "username"
 
 
 class MainView(TemplateView):
@@ -120,12 +86,7 @@ class MainView(TemplateView):
             .order_by("topic")
         )
 
-        # print([*Post.objects.filter(subtopic__topic=None).distinct("subtopic")])
-
         return context
-
-
-from django.db.models import Q, Count, Subquery, Max, OuterRef
 
 
 class TopicView(CreateView):
@@ -153,11 +114,14 @@ class TopicView(CreateView):
         threads: Manager[Thread] = topic.thread_set
         context["topic"] = topic
 
-        page_info = PageInfo(
-            page=int(self.request.GET.get("page", 1)),
-            total_count=threads.count(),
-            start_page=1,
+        paginator = Paginator(
+            threads.all(),
+            10,
         )
-        context["threads"] = threads.all()[page_info.slice()]
+
+        page = self.request.GET.get("page", 1)
+        context["paginator"] = paginator
+        context["object_list"] = paginator.page(page)
+        context["page"] = page
 
         return context

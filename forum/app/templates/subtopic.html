@@ -28,7 +28,7 @@
 
   {% with thread=subtopic.thread_set.first %}
   <!--  -->
-  {% with post=thread.post_set.last %} {% if post %}
+  {% with post=thread.post_set.latest %} {% if post %}
   <div class="flex gap-2">
     <!-- -->
 

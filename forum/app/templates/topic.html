@@ -11,7 +11,7 @@
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
     <div class="bg-base-100/30 grid p-8 gap-4">
-      <div class="text-sm breadcrumbs">
+      <div class="text-sm breadcrumbs ml-8">
         <ul>
           {% for topic in topic.path %}
           <li>
@@ -39,13 +39,19 @@
       </div>
 
       {% endif %}
+      
+      {% if paginator.num_pages > 1 %}
+      <div class="ml-8">
+        {% include 'pagination.html' %}
+      </div>
+      {% endif %}
 
       <div class="card bg-base-100">
         <div class="card-body">
-          {% if threads|length > 0 %}
-          <ul>
-            {% for thread in threads %}
-            <li class="grid grid-cols-[1fr_100px]">
+          {% if object_list|length > 0 %}
+          <ul class="divide-y gap-2 grid divide-base-content/20">
+            {% for thread in object_list %}
+            <li class="grid grid-cols-[1fr_100px] pt-2">
               <div>
                 <h4 class="">
                   <a
@@ -70,8 +76,8 @@
                   repl{{thread.post_set.count|pluralize:'y,ies'}}
                 </div>
               </div>
-              {% with post=thread.post_set.last %} {% if post %}
-              <div class="flex flex-col items-center gap-2">
+              {% with post=thread.post_set.latest %} {% if post %}
+              <div class="flex flex-col items-center text-center gap-2">
                 <!-- -->
 
                 {% load static %} {% static "avatar.gif" as avatar %}
@@ -101,7 +107,13 @@
         </div>
       </div>
 
-      <div class="card card-compact bg-base-100">
+      {% if paginator.num_pages > 1 %}
+      <div class="ml-8">
+        {% include 'pagination.html' %}
+      </div>
+      {%  endif %} 
+
+      <div class="card bg-base-100">
         <div class="card-body">
           {% if user.is_authenticated %}
 
