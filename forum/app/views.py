@@ -45,15 +45,12 @@ from django.views.generic import CreateView
 
 from django import forms
 
-from django.urls import reverse_lazy
+from django.urls import reverse
 
 
 class ThreadView(CreateView):
     template_name = "thread.html"
     form_class = CreatePostForm
-
-    def get_success_url(self):
-        return reverse_lazy("thread", kwargs=self.kwargs)
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -134,12 +131,6 @@ from django.db.models import Q, Count, Subquery, Max, OuterRef
 class TopicView(CreateView):
     template_name = "topic.html"
     form_class = CreateThreadForm
-
-    def get_success_url(self):
-        object: Thread = self.object
-        return reverse_lazy(
-            "thread", kwargs={"thread": object.slug, "topic_pk": object.subtopic.pk}
-        )
 
     def form_valid(self, form):
         form.instance.author = self.request.user

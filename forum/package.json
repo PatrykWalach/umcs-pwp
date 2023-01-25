@@ -3,7 +3,8 @@
   "packageManager": "yarn@3.3.1",
   "scripts": {
     "tailwind": "tailwindcss -i ./input.css -o ./app/static/main.css",
-    "dev": "python manage.py runserver 0.0.0.0:8000"
+    "dev": "python manage.py runserver 0.0.0.0:8000",
+    "test": "pytest"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.9",

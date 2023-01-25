@@ -16,7 +16,7 @@
           {% for topic in topic.path %}
           <li>
             <a
-              href="{% if topic.topic is not None %}{% url 'topic' topic.topic.pk topic.slug %}{% else %}{% url 'topic' topic.slug %}{% endif %}"
+              href="{{ topic.get_absolute_url }}"
               >{{topic.name}}</a
             >
           </li>
@@ -50,7 +50,7 @@
                 <h4 class="">
                   <a
                     class="link link-hover text-xl"
-                    href="{%url 'thread' topic.pk thread.slug %}"
+                    href="{{ thread.get_absolute_url }}"
                     >{{thread.title}}</a
                   >
                 </h4>
@@ -78,7 +78,7 @@
                 <div class="avatar">
                   <div class="w-12 rounded-full">
                     <a
-                      href="{% url 'thread' thread.subtopic.pk thread.slug %}#post-{{post.id}}"
+                      href="{{post.get_absolute_url}}"
                       class="contents"
                     >
                       <img
