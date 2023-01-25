@@ -14,9 +14,11 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - run: cd forum
       - run: pip install -r requirements.txt
+        working-directory: ./forum
       - run: pip install -r requirements-dev.txt
-      
+        working-directory: ./forum
+
       - name: Run E2E tests 🧪
         run: pytest
+        working-directory: ./forum
