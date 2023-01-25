@@ -1,13 +1,20 @@
+from __future__ import annotations
+
+import os
+import re
+
+import pytest
+from app.models import Post, Profile, SubTopic, Thread
+from django.contrib.auth.models import User
+from django.urls import reverse
 from playwright.sync_api import Page, expect
 
-from django.urls import reverse
-import re
-import os
-import pytest
-from django.contrib.auth.models import User
-from app.models import Profile
-
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
+
+@pytest.fixture(autouse=True)
+def set_default_navigation_timeout(page: Page):
+    page.set_default_navigation_timeout(5000)
 
 
 def test_main_page_title(live_server, page: Page):
@@ -28,7 +35,9 @@ def test_navbar_login_navigation(live_server, page: Page):
 
 def test_navbar_viewer_avatar(live_server, user: User, page: Page):
     # given
-    profile = Profile.objects.create(avatar="http://www.test.com/avatar.png", user=user)
+    profile = Profile.objects.create(
+        avatar="https://media.giphy.com/media/a6pzK009rlCak/giphy.gif", user=user
+    )
     # when
     page.goto(live_server.url)
     # then
@@ -48,10 +57,10 @@ def test_navbar_viewer_default_avatar(live_server, user: User, page: Page):
 
 @pytest.fixture
 def user(live_server, page: Page, django_user_model):
-    user = django_user_model.objects.create_user(username="user", password="user")
+    password = "user"
+    user = django_user_model.objects.create_user(username="user", password=password)
     page.goto(live_server.url + reverse("login"))
 
-    password = "user"
     page.get_by_role("textbox", name="Username:").type(user.username)
     page.get_by_role("textbox", name="Password:").type(password)
     page.get_by_role("button", name="Login").click()
@@ -89,9 +98,6 @@ def test_duplicate_username(live_server, page: Page, django_user_model):
     page.get_by_role("button", name="Register").click()
     # then
     page.get_by_text("A user with that username already exsists.")
-
-
-from app.models import SubTopic, Thread, Post
 
 
 def test_post_create(live_server, page: Page, user: User):

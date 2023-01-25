@@ -1,13 +1,27 @@
+name: Test
+on:
+  pull_request:
+    types: [opened, synchronize]
 
+jobs:
+  e2e-test:
+    name: E2E tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./forum
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
 
+      - run: pip install -r requirements.txt
+      - run: pip install -r requirements-dev.txt
+      
+      - name: Ensure browsers are installed
+        run: python -m playwright install --with-deps
 
-steps:
-- uses: actions/checkout@v3
-- uses: actions/setup-python@v4
-  with:
-    python-version: '3.11' 
-    cache: 'pip'
-    
-- run: cd forum
-- run: pip install -r requirements.txt
-- run: pytest
+      - name: Run E2E tests 🧪
+        run: pytest
