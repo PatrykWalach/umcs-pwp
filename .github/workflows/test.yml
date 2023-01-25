@@ -19,7 +19,9 @@ jobs:
 
       - run: pip install -r requirements.txt
       - run: pip install -r requirements-dev.txt
-      - run: playwright install     
+      
+      - name: Ensure browsers are installed
+        run: python -m playwright install --with-deps
 
       - name: Run E2E tests 🧪
         run: pytest
