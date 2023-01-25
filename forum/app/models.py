@@ -30,8 +30,15 @@ class SubTopic(models.Model):
 
         return path + [self]
 
+    def get_absolute_url(self):
+        if self.topic == None:
+            return reverse("topic", kwargs={"topic": self.slug})
+
+        return reverse("topic", kwargs={"topic": self.slug, "topic_pk": self.topic.pk})
+
 
 from django.db.models.constraints import UniqueConstraint
+from django.urls import reverse
 
 
 class Thread(models.Model):
@@ -56,6 +63,11 @@ class Thread(models.Model):
     ) -> None:
         return super().validate_unique()
 
+    def get_absolute_url(self):
+        return reverse(
+            "thread", kwargs={"thread": self.slug, "topic_pk": self.subtopic.pk}
+        )
+
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -68,6 +80,9 @@ class Post(models.Model):
 
     def __str__(self) -> str:
         return str(self.pk)
+
+    def get_absolute_url(self):
+        return f"{self.thread.get_absolute_url()}#post-{self.pk}"
 
 
 class Profile(models.Model):
