@@ -1,0 +1,14 @@
+{
+  "name": "forum",
+  "packageManager": "yarn@3.3.1",
+  "scripts": {
+    "tailwind": "tailwindcss -i ./input.css -o ./app/static/main.css",
+    "dev": "python manage.py runserver 0.0.0.0:8000"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.9",
+    "daisyui": "^2.47.0",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.4"
+  }
+}

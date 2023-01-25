@@ -1,0 +1,24 @@
+<div class="btn-group">
+  {% if page_info.page > 1 %}
+  <div class="tooltip" data-tip="First page">
+    <a class="btn" href="?page=1">«</a>
+  </div>
+  <!-- <div class="tooltip" data-tip="Previous page">
+  <a   class="btn" href="?page={{ page_info.page|add:'-1' }}">PREV</a>
+</div> -->
+  {% endif %} {% for page in page_info.pages %}
+  <a
+    href="?page={{page}}"
+    class="btn {% if page_info.page == page %} btn-active {% endif %}"
+  >
+    {{page}}
+  </a>
+  {% endfor %} {% if page_info.page < page_info.end_page %}
+  <!-- <div class="tooltip" data-tip="Next page">
+  <a   class="btn" href="?page={{ page_info.page|add:'1' }}">NEXT</a>
+</div> -->
+  <div class="tooltip" data-tip="Last page">
+    <a class="btn" href="?page=1">»</a>
+  </div>
+  {% endif %}
+</div>

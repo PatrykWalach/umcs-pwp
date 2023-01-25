@@ -1,0 +1,26 @@
+{% load static %}
+{% static 'avatar.gif' as avatar %}
+
+
+
+<div class="chat chat-start">
+  <div class="chat-image self-start avatar">
+    <div class="w-24 rounded-full">
+      <img src="{{user.profile.avatar|default:avatar}}" />
+    </div>
+  </div>
+
+  <div
+    class="chat-bubble max-w-none p-0 w-full scale-y-[-1] after:[mask-image:url('data:image/svg+xml;base64,DQo8c3ZnIHdpZHRoPSczJyBoZWlnaHQ9JzMnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZycgIGZpbGw9J2JsYWNrJz4NCjxwYXRoIGQ9J20gMCAzIEwgMyAzIEwgMyAwIEMgMyAxIDEgMyAwIDMnPjwvcGF0aD4NCjwvc3ZnPg==')] after:w-4 after:h-4 after:absolute after:-left-[1.125rem] after:-bottom-[0.125rem] after:[mask-position:center] after:[mask-size:contain] after:[mask-repeat:no-repeat] focus-within:after:bg-base-content/20 after:-z-10 focus-within:before:bg-base-100 before:z-30 before:duration-200 before:ease-in-out before:transition-all"
+  >
+    <div class="scale-y-[-1] z-20 form-control">
+      <textarea
+        name="{{ widget.name }}"
+        class="textarea textarea-ghost resize-none [border-top-left-radius:0] !outline-offset-0"
+        rows="8"
+        {% include 'django/forms/widgets/attrs.html' %}
+      >{% if widget.value %}{{ widget.value }}{% endif %}</textarea
+      >
+    </div>
+  </div>
+</div>

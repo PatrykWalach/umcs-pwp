@@ -1,0 +1,5 @@
+
+  <input type="{{ widget.type }}" class="input input-bordered" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+
+
+
