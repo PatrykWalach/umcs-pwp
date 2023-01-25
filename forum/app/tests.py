@@ -1,11 +1,13 @@
-from playwright.sync_api import Page, expect
+from __future__ import annotations
 
-from django.urls import reverse
-import re
 import os
+import re
+
 import pytest
+from app.models import Post, Profile, SubTopic, Thread
 from django.contrib.auth.models import User
-from app.models import Profile
+from django.urls import reverse
+from playwright.sync_api import Page, expect
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
@@ -26,7 +28,7 @@ def test_navbar_login_navigation(live_server, page: Page):
     expect(page).to_have_url(re.compile(reverse("login")))
 
 
-def test_navbar_viewer_avatar(live_server, user: User, page: Page):
+def test_navbar_user_avatar(live_server, user: User, page: Page):
     # given
     profile = Profile.objects.create(avatar="http://www.test.com/avatar.png", user=user)
     # when
@@ -91,9 +93,6 @@ def test_duplicate_username(live_server, page: Page, django_user_model):
     page.get_by_text("A user with that username already exsists.")
 
 
-from app.models import SubTopic, Thread, Post
-
-
 def test_post_create(live_server, page: Page, user: User):
     # given
     thread = Thread.objects.create(
@@ -134,3 +133,21 @@ def test_post_create_preview(live_server, page: Page, user: User):
     page.get_by_role("listitem", name="item 1")
     page.get_by_role("listitem", name="item 2")
     assert Post.objects.count() == 0
+
+
+def test_bubble_user_avatar(live_server, page: Page, user: User):
+    # given
+    thread = Thread.objects.create(
+        author=user,
+        slug="user-thread",
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    profile = Profile.objects.create(user=user, avatar="http://www.test.com/avatar.png")
+
+    # when
+    page.goto(live_server.url + thread.get_absolute_url())
+    # then
+    assert (
+        page.get_by_role("form").get_by_role("img").get_attribute("src")
+        == profile.avatar
+    )
