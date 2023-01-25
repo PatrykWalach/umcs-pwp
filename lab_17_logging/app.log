@@ -1,0 +1,52 @@
+Watching for file changes with StatReloader
+"GET /error_page/ HTTP/1.1" 200 450
+"GET /error_page/ HTTP/1.1" 200 450
+"GET /error_page/ HTTP/1.1" 200 450
+"GET / HTTP/1.1" 200 585
+D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+Watching for file changes with StatReloader
+D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+Watching for file changes with StatReloader
+D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO "GET /error_page/ HTTP/1.1" 200 450
+INFO D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\app\settings.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader
+INFO D:\Projekty\umcs-pwp\lab_15_auth\profile\urls.py changed, reloading.
+INFO Watching for file changes with StatReloader

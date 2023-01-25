@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h1>{{header}}</h1>
+    <main>
+      <h2>{%if items|length %} {{some}} {% else %} {{none}} {% endif %}</h2>
+
+      <table>
+        <thead>
+          <tr>
+              <th colspan="2">Reader</th>
+            <th>Books</th>
+          </tr>
+          <tr>
+              <th>Name</th>
+              <th>Last Name</th>
+            <th>Title</th>
+          </tr>
+        </thead>
+        {% regroup items by reader as borrowings %}
+        <tbody>
+          
+          
+          {% for reader, reader_borrowings in borrowings %}
+          <!-- <tr>
+                <td rowspan="{{ reader.borrowing | length }}">{{reader.name}}</td>
+                <td rowspan="{{ reader.borrowing | length }}">
+                    {{reader.last_name}}
+                </td>
+            </tr> -->
+            <tr>
+                <td rowspan="{{reader_borrowings|length}}">{{reader.name}}</td>
+                <td rowspan="{{reader_borrowings|length}}">{{reader.last_name}}</td>
+                {% for borrowing in reader_borrowings|slice:":1" %}
+            
+                    <td>{{borrowing.book.title}}</td>
+        
+                {% endfor %}
+            </tr>
+
+            {% for borrowing in reader_borrowings|slice:"1:" %}
+            <tr>
+                <td>{{borrowing.book.title}}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>
