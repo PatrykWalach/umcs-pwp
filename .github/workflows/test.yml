@@ -5,8 +5,11 @@ on:
 
 jobs:
   e2e-test:
-    runs-on: ubuntu-latest
     name: E2E tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./forum
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -15,10 +18,8 @@ jobs:
           cache: "pip"
 
       - run: pip install -r requirements.txt
-        working-directory: ./forum
       - run: pip install -r requirements-dev.txt
-        working-directory: ./forum
+      - run: playwright install     
 
       - name: Run E2E tests 🧪
         run: pytest
-        working-directory: ./forum
