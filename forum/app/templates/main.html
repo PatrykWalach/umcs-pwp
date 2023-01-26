@@ -20,12 +20,21 @@
           </div>
           <ul class="divide-y gap-2 grid divide-base-content/20">
             {% for subtopic in subtopics %}
-            <li>{% include 'subtopic.html' %} {% endfor%}</li>
+            <li>
+              <div class="grid grid-cols-[auto_minmax(0,1fr)_auto] pt-2 gap-4 md:gap-8 items-start">
+                {% include 'subtopic.html' %}
+                <!--  -->
+                {% include 'subtopic_recent_post.html' %}
+                <!--  -->
+                {% include 'subtopic_post_count.html' %}
+              </div>
+            </li>
+            {% endfor%}
           </ul>
         </div>
       </div>
-
       {% endfor %}
+     
     </div>
   </div>
 </main>

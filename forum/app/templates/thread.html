@@ -64,7 +64,7 @@
           {% include 'post.html' with post=post %}
         </div>
       </div>
-      {% endfor %} {% if page_info.pages|length > 1 %}
+      {% endfor %} {% if paginator.num_pages > 1 %}
       <footer class="card bg-base-100">
         <div class="card-body">{% include 'pagination.html' %}</div>
       </footer>
