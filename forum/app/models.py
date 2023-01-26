@@ -5,11 +5,22 @@ import typing
 from email.headerregistry import UniqueAddressHeader
 
 import django.db.models as models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+from django.db.models import F, Q
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import RowNumber
 from django.urls import reverse
 from django.utils.timezone import now, timedelta
+
+
+class User(AbstractUser):
+    avatar = models.URLField()
+
+    def get_absolute_url(self) -> str:
+        return reverse("user", kwargs={"username": self.username})
+
+    class Meta:
+        db_table = "auth_user"
 
 
 class SubTopic(models.Model):
@@ -45,28 +56,17 @@ class SubTopic(models.Model):
 class Thread(models.Model):
     subtopic = models.ForeignKey(SubTopic, on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=150)
-    slug = models.SlugField()
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        unique_together = ["slug", "subtopic"]
-
     def __str__(self) -> str:
-        return f"{str(self.subtopic)}{self.slug}/"
+        return f"{str(self.subtopic)}{self.pk}/"
 
     def post_count(self):
         return self.post_set.count()
 
-    def validate_unique(
-        self, exclude: typing.Optional[typing.Collection[str]] = ...
-    ) -> None:
-        return super().validate_unique()
-
     def get_absolute_url(self):
-        return reverse(
-            "thread", kwargs={"thread": self.slug, "topic_pk": self.subtopic.pk}
-        )
+        return reverse("thread", kwargs={"pk": self.pk})
 
 
 class Post(models.Model):
@@ -89,11 +89,3 @@ class Post(models.Model):
         page = index // 10 + 1
 
         return f"{self.thread.get_absolute_url()}?page={page}#post-{self.pk}"
-
-
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.URLField()
-
-    def __str__(self) -> str:
-        return self.user.username

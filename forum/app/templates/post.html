@@ -33,7 +33,7 @@
       {% endif %}
       <div class="w-24 rounded-full">
         <a href="{% url 'user' post.author.username %}" class="contents">
-          <img src="{{ post.author.profile.avatar|default:avatar }}" />
+          <img src="{{ post.author.avatar|default:avatar }}" />
         </a>
       </div>
     </div>
@@ -71,7 +71,7 @@
       <div class="avatar md:hidden">
         <div class="w-12 rounded-full">
           <a href="{% url 'user' post.author.username %}" class="contents">
-            <img src="{{post.author.profile.avatar|default:avatar}}" />
+            <img src="{{post.author.avatar|default:avatar}}" />
           </a>
         </div>
       </div>

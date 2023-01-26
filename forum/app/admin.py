@@ -1,5 +1,9 @@
-from django.contrib import admin
+from __future__ import annotations
+
+import app.forms as forms
 import app.models as models
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
 @admin.register(models.SubTopic)
@@ -10,35 +14,19 @@ class SubTopicAdmin(admin.ModelAdmin):
 
 @admin.register(models.Thread)
 class ThreadAdmin(admin.ModelAdmin):
-    prepopulated_fields = {"slug": ("title",)}
-    list_display = ("title", "slug", "author", "subtopic", "created_at")
+    list_display = ("title", "author", "subtopic", "created_at")
 
 
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
-
-
-@admin.register(models.Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "avatar")
-
-
-class ProfileInline(admin.StackedInline):
-    model = models.Profile
-    can_delete = False
-    verbose_name_plural = "profile"
-
-
-admin.site.unregister(User)
-
-
-@admin.register(User)
+@admin.register(models.User)
 class UserAdmin(BaseUserAdmin):
-    inlines = (ProfileInline,)
-
-
-import app.forms as forms
+    list_display = (
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "avatar",
+    )
 
 
 @admin.register(models.Post)

@@ -13,7 +13,7 @@
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
     <div class="bg-base-100/30 grid p-8 gap-4">
-      <div class="text-sm breadcrumbs ml-8">
+      <div class="text-sm breadcrumbs mx-8">
         <ul>
           {% for topic in thread.subtopic.path %}
           <li>
@@ -30,7 +30,7 @@
 
       {% if paginator.num_pages > 1 %}
 
-          <div class="ml-8 justify-center flex">
+          <div class="justify-center flex">
 
             {% include 'pagination.html' %}
           </div>
@@ -46,7 +46,7 @@
           <div class="flex gap-2">
             <div class="avatar">
               <div class="w-12 rounded-full">
-                <img src="{{thread.author.profile.avatar|default:avatar}}" />
+                <img src="{{thread.author.avatar|default:avatar}}" />
               </div>
             </div>
             <div>
@@ -73,14 +73,18 @@
           {% include 'post.html' with post=post %}
         </div>
       </div>
-      {% endfor %} {% if paginator.num_pages > 1 %}
+      {% endfor %} 
+      
+      
+      {% if paginator.num_pages > 1 %}
 
-          <div class="ml-8 justify-center flex">
+
+          <div class="justify-center flex">
             {% include 'pagination.html' %}
           </div>
 
       {% endif %} {% if form.content.value %}
-      <div class="card bg-neutral text-neutral-content">
+      <div id="preview" class="card bg-neutral text-neutral-content">
         <div class="card-body">
           {% include 'post.html' with post=preview %}
         </div>
@@ -95,8 +99,8 @@
           {% if user.is_authenticated %}
 
           <form
-            action="#reply"
-            id="reply"
+            action="#leave-a-comment"
+            id="leave-a-comment"
             method="POST"
           >
             {% csrf_token %} {{form.as_div}}
@@ -123,7 +127,7 @@
               <div class="">
                 <h2>Create an account</h2>
                 <p>Sign up for a new account in our community. It's easy!</p>
-                <a href="{%url 'signup' %}" class="btn btn-wide"
+                <a href="{%url 'register' %}" class="btn btn-wide"
                   >Register a new account</a
                 >
               </div>

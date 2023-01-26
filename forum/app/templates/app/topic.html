@@ -11,7 +11,7 @@
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
     <div class="bg-base-100/30 grid p-8 gap-4">
-      <div class="text-sm breadcrumbs ml-8">
+      <div class="text-sm breadcrumbs mx-8">
         <ul>
           {% for topic in topic.path %}
           <li>
@@ -45,7 +45,7 @@
       </div>
 
       {% endif %} {% if paginator.num_pages > 1 %}
-      <div class="ml-8">{% include 'pagination.html' %}</div>
+      <div class="flex justify-center">{% include 'pagination.html' %}</div>
       {% endif %}
 
       <div class="card bg-base-100">
@@ -80,7 +80,7 @@
               </div>
               <div class="flex flex-col items-center text-center gap-2">
                 {% load static %} {% static "avatar.gif" as avatar %}
-                <ul class="flex -space-x-4 space-x-reverse flex-row-reverse">
+                <ul class="flex -space-x-5 space-x-reverse flex-row-reverse">
                   {% for post in thread.post_set.all.reverse|slice:":3:" %}
                   <li>
                     <!-- -->
@@ -88,7 +88,7 @@
                       <div class="w-10 rounded-full rotate-90">
                         <a href="{{post.get_absolute_url}}" class="contents">
                           <img
-                            src="{{post.author.profile.avatar|default:avatar}}"
+                            src="{{post.author.avatar|default:avatar}}"
                           />
                         </a>
                       </div>
@@ -110,7 +110,7 @@
       </div>
 
       {% if paginator.num_pages > 1 %}
-      <div class="ml-8">{% include 'pagination.html' %}</div>
+      <div class="flex justify-center">{% include 'pagination.html' %}</div>
       {% endif %}
 
       <div class="card bg-base-100">
@@ -130,14 +130,14 @@
 
           <div class="text-center grid prose max-w-none">
             <div class="">
-              <h2>Create an account or sign in to comment</h2>
-              <p>You need to be a member in order to leave a comment</p>
+              <h2>Create an account or sign in to create new thread</h2>
+              <p>You need to be a member in order to create a new thread</p>
             </div>
             <div class="flex justify-evenly">
               <div class="">
                 <h2>Create an account</h2>
                 <p>Sign up for a new account in our community. It's easy!</p>
-                <a href="{%url 'signup' %}" class="btn btn-wide"
+                <a href="{%url 'register' %}" class="btn btn-wide"
                   >Register a new account</a
                 >
               </div>
