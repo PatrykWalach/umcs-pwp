@@ -15,10 +15,7 @@
         <ul>
           {% for topic in topic.path %}
           <li>
-            <a
-              href="{{ topic.get_absolute_url }}"
-              >{{topic.name}}</a
-            >
+            <a href="{{ topic.get_absolute_url }}">{{topic.name}}</a>
           </li>
           {% endfor %}
         </ul>
@@ -31,19 +28,24 @@
           <div class="card-title !text-2xl">Subtopics</div>
           <ul class="divide-y gap-2 grid divide-base-content/20">
             {% for subtopic in topic.subtopic_set.all %}
-
-            <li>{% include 'subtopic.html' %}</li>
+            <li>
+              <div
+                class="grid grid-cols-[auto_minmax(0,1fr)_auto] pt-2 gap-4 md:gap-8 items-start"
+              >
+                {% include 'subtopic.html' %}
+                <!--  -->
+                {% include 'subtopic_recent_post.html' %}
+                <!--  -->
+                {% include 'subtopic_post_count.html' %}
+              </div>
+            </li>
             {% endfor%}
           </ul>
         </div>
       </div>
 
-      {% endif %}
-      
-      {% if paginator.num_pages > 1 %}
-      <div class="ml-8">
-        {% include 'pagination.html' %}
-      </div>
+      {% endif %} {% if paginator.num_pages > 1 %}
+      <div class="ml-8">{% include 'pagination.html' %}</div>
       {% endif %}
 
       <div class="card bg-base-100">
@@ -76,30 +78,30 @@
                   repl{{thread.post_set.count|pluralize:'y,ies'}}
                 </div>
               </div>
-              {% with post=thread.post_set.latest %} {% if post %}
               <div class="flex flex-col items-center text-center gap-2">
-                <!-- -->
-
                 {% load static %} {% static "avatar.gif" as avatar %}
-                <div class="avatar">
-                  <div class="w-12 rounded-full">
-                    <a
-                      href="{{post.get_absolute_url}}"
-                      class="contents"
-                    >
-                      <img
-                        src="{{post.author.profile.avatar|default:avatar}}"
-                      />
-                    </a>
-                  </div>
-                </div>
+                <ul class="flex -space-x-4 space-x-reverse flex-row-reverse">
+                  {% for post in thread.post_set.all.reverse|slice:":3:" %}
+                  <li>
+                    <!-- -->
+                    <div class="avatar shadow shadow-base-content/80 -rotate-90 rounded-full">
+                      <div class="w-10 rounded-full rotate-90">
+                        <a href="{{post.get_absolute_url}}" class="contents">
+                          <img
+                            src="{{post.author.profile.avatar|default:avatar}}"
+                          />
+                        </a>
+                      </div>
+                    </div>
+                  </li>
+                  {%endfor%}
+                </ul>
                 <div class="text-xs">
                   <time datetime="{{created_at|date:'c'}}"
-                    >{{post.created_at|naturaltime}}</time
+                    >{{thread.post_set.latest.created_at|naturaltime}}</time
                   >
                 </div>
               </div>
-              {%endif %} {%endwith%}
             </li>
             {% endfor%}
           </ul>
@@ -108,10 +110,8 @@
       </div>
 
       {% if paginator.num_pages > 1 %}
-      <div class="ml-8">
-        {% include 'pagination.html' %}
-      </div>
-      {%  endif %} 
+      <div class="ml-8">{% include 'pagination.html' %}</div>
+      {% endif %}
 
       <div class="card bg-base-100">
         <div class="card-body">

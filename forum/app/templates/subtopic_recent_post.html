@@ -1,0 +1,26 @@
+{% load humanize %}
+<!--  -->
+<div class="flex justify-end gap-2">
+  {% with thread=subtopic.thread_set.first %}
+  <!--  -->
+  {% with post=thread.post_set.latest %} {% if post %}
+
+  <div class="avatar">
+    {% load static %} {% static "avatar.gif" as avatar %}
+    <div class="w-12 rounded-full">
+      <img src="{{post.author.profile.avatar|default:avatar}}" />
+    </div>
+  </div>
+  <div class="truncate">
+    <div class="truncate">
+      <a class="link link-hover" href="{{post.get_absolute_url}}"
+        >{{thread.title}}</a
+      >
+    </div>
+    <span>By {{ post.author.username }},</span>
+    <time datetime="{{created_at|date:'c'}}"
+      >{{post.created_at|naturaltime}}</time
+    >
+  </div>
+  {% endif %} {% endwith %} {% endwith %}
+</div>

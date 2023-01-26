@@ -14,7 +14,7 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 @pytest.fixture(autouse=True)
 def set_default_navigation_timeout(page: Page):
-    page.set_default_navigation_timeout(5000)
+    page.set_default_navigation_timeout(3000)
 
 
 def test_main_page_title(live_server, page: Page):
@@ -140,3 +140,71 @@ def test_post_create_preview(live_server, page: Page, user: User):
     page.get_by_role("listitem", name="item 1")
     page.get_by_role("listitem", name="item 2")
     assert Post.objects.count() == 0
+
+
+def test_post_pagination_navigation(live_server, page: Page, user: User):
+    # given
+    thread = Thread.objects.create(
+        author=user,
+        slug="user-thread",
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    Post.objects.bulk_create(
+        Post(thread=thread, author=user, content="# Test") for _ in range(100)
+    )
+    page.goto(live_server.url + thread.get_absolute_url())
+    # when
+    page.get_by_role("link", name="Go to page 2").first.click()
+    # then
+    expect(page).to_have_url(live_server.url + thread.get_absolute_url() + "?page=2")
+
+
+def test_post_pagination_initial(live_server, page: Page, user: User):
+    # given
+    thread = Thread.objects.create(
+        author=user,
+        slug="user-thread",
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    Post.objects.bulk_create(
+        Post(thread=thread, author=user, content="# Test") for _ in range(100)
+    )
+    # when
+    page.goto(live_server.url + thread.get_absolute_url())
+    # then
+    expect(page.get_by_role("heading", name="Test")).to_have_count(10)
+
+    expect(page.get_by_role("link", name="Go to first page")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to page -1")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to page 0")).to_have_count(0)
+    for i in range(1, 7):
+        expect(page.get_by_role("link", name=f"Go to page {i}")).to_have_count(2)
+    expect(page.get_by_role("link", name="Go to page 7")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to last page")).to_have_count(2)
+
+
+def test_post_pagination(live_server, page: Page, user: User):
+    # given
+    thread = Thread.objects.create(
+        author=user,
+        slug="user-thread",
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    Post.objects.bulk_create(
+        Post(thread=thread, author=user, content="# Test") for _ in range(100)
+    )
+    # when
+    page.goto(live_server.url + thread.get_absolute_url() + "?page=7")
+    # then
+    expect(page.get_by_role("heading", name="Test")).to_have_count(10)
+
+    expect(page.get_by_role("link", name="Go to first page")).to_have_count(2)
+    for i in range(-1, 2):
+        expect(
+            page.get_by_role("link", exact=True, name=f"Go to page {i}")
+        ).to_have_count(0)
+    for i in range(2, 11):
+        expect(page.get_by_role("link", name=f"Go to page {i}")).to_have_count(2)
+    expect(page.get_by_role("link", name="Go to page 11")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to page 12")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to last page")).to_have_count(2)

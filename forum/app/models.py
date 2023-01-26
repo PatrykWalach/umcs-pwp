@@ -76,7 +76,8 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        get_latest_by = "created_at"
+        get_latest_by = "pk"
+        ordering = ("pk",)
 
     def __str__(self) -> str:
         return str(self.pk)

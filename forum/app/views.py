@@ -44,7 +44,7 @@ class ThreadView(CreateView):
         context["thread"] = thread
 
         paginator = Paginator(
-            posts.all(),
+            posts.order_by("pk").all(),
             10,
         )
         page = self.request.GET.get("page", 1)
@@ -115,7 +115,7 @@ class TopicView(CreateView):
         context["topic"] = topic
 
         paginator = Paginator(
-            threads.all(),
+            threads.order_by("-pk").all(),
             10,
         )
 

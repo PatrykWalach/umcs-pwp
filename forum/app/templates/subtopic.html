@@ -1,6 +1,5 @@
 {% load humanize %}
-
-<div class="grid grid-cols-[1fr_4rem_minmax(3rem,15rem)] pt-2 items-start">
+ 
   <div>
     <div class="flex gap-2 items-center text-xl">
       <a href="{{ subtopic.get_absolute_url }}" class="link link-hover"
@@ -13,44 +12,18 @@
       {% if subtopic.subtopic_set.count > 0 %}
       <ul class="flex list-disc list-inside flex-wrap gap-2">
         {% for subtopic in subtopic.subtopic_set.all %}
-        <li class=""><a class="link link-hover" href="{{ subtopic.get_absolute_url }}">{{subtopic.name}}</a></li>
+        <li class="">
+          <a class="link link-hover" href="{{ subtopic.get_absolute_url }}"
+            >{{subtopic.name}}</a
+          >
+        </li>
         {% endfor %}
       </ul>
       {% else %} {{subtopic.description}} {% endif %}
     </div>
   </div>
 
-  <div class="stat py-0">
-    <!-- <div class="stat-title">Posts</div> -->
-    <div class="stat-value">{{subtopic.post_count|intword}}</div>
-    <div class="stat-desc">post{{subtopic.post_count|pluralize}}</div>
-  </div>
-
-  {% with thread=subtopic.thread_set.first %}
-  <!--  -->
-  {% with post=thread.post_set.latest %} {% if post %}
-  <div class="flex gap-2">
-    <!-- -->
-
-    <div class="avatar">
-      {% load static %} {% static "avatar.gif" as avatar %}
-      <div class="w-12 rounded-full">
-        <img src="{{post.author.profile.avatar|default:avatar}}" />
-      </div>
-    </div>
-    <div class="truncate">
-      <div class="truncate">
-        <a
-          class="link link-hover"
-          href="{{post.get_absolute_url}}"
-          >{{thread.title}}</a
-        >
-      </div>
-      <span>By {{ post.author.username }},</span>
-      <time datetime="{{created_at|date:'c'}}"
-        >{{post.created_at|naturaltime}}</time
-      >
-    </div>
-  </div>
-  {% endif %} {% endwith %} {% endwith %}
-</div>
+ 
+ 
+ 
+ 
