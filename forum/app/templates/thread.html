@@ -28,6 +28,15 @@
         </ul>
       </div>
 
+      {% if paginator.num_pages > 1 %}
+
+          <div class="ml-8 justify-center flex">
+
+            {% include 'pagination.html' %}
+          </div>
+
+      {% endif %} 
+
       <section class="card bg-base-100">
         <div class="card-body">
           <div class="card-title">
@@ -65,9 +74,11 @@
         </div>
       </div>
       {% endfor %} {% if paginator.num_pages > 1 %}
-      <footer class="card bg-base-100">
-        <div class="card-body">{% include 'pagination.html' %}</div>
-      </footer>
+
+          <div class="ml-8 justify-center flex">
+            {% include 'pagination.html' %}
+          </div>
+
       {% endif %} {% if form.content.value %}
       <div class="card bg-neutral text-neutral-content">
         <div class="card-body">

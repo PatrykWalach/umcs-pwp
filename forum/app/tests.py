@@ -154,7 +154,7 @@ def test_post_pagination_navigation(live_server, page: Page, user: User):
     )
     page.goto(live_server.url + thread.get_absolute_url())
     # when
-    page.get_by_role("link", name="Go to page 2").click()
+    page.get_by_role("link", name="Go to page 2").first.click()
     # then
     expect(page).to_have_url(live_server.url + thread.get_absolute_url() + "?page=2")
 
@@ -178,9 +178,9 @@ def test_post_pagination_initial(live_server, page: Page, user: User):
     expect(page.get_by_role("link", name="Go to page -1")).to_have_count(0)
     expect(page.get_by_role("link", name="Go to page 0")).to_have_count(0)
     for i in range(1, 7):
-        expect(page.get_by_role("link", name=f"Go to page {i}")).to_have_count(1)
+        expect(page.get_by_role("link", name=f"Go to page {i}")).to_have_count(2)
     expect(page.get_by_role("link", name="Go to page 7")).to_have_count(0)
-    expect(page.get_by_role("link", name="Go to last page")).to_have_count(1)
+    expect(page.get_by_role("link", name="Go to last page")).to_have_count(2)
 
 
 def test_post_pagination(live_server, page: Page, user: User):
@@ -198,13 +198,13 @@ def test_post_pagination(live_server, page: Page, user: User):
     # then
     expect(page.get_by_role("heading", name="Test")).to_have_count(10)
 
-    expect(page.get_by_role("link", name="Go to first page")).to_have_count(1)
+    expect(page.get_by_role("link", name="Go to first page")).to_have_count(2)
     for i in range(-1, 2):
         expect(
             page.get_by_role("link", exact=True, name=f"Go to page {i}")
         ).to_have_count(0)
     for i in range(2, 11):
-        expect(page.get_by_role("link", name=f"Go to page {i}")).to_have_count(1)
+        expect(page.get_by_role("link", name=f"Go to page {i}")).to_have_count(2)
     expect(page.get_by_role("link", name="Go to page 11")).to_have_count(0)
     expect(page.get_by_role("link", name="Go to page 12")).to_have_count(0)
-    expect(page.get_by_role("link", name="Go to last page")).to_have_count(1)
+    expect(page.get_by_role("link", name="Go to last page")).to_have_count(2)

@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import re
-from django import forms
-from app.models import (
-    Post,
-    Thread,
-)
+
 import django.db.models as models
+from app.models import Post, Thread
+from django import forms
+from django.core.exceptions import ValidationError
 
 
 class PostForm(forms.ModelForm):
@@ -23,14 +24,12 @@ class CreatePostForm(forms.ModelForm):
         model = Post
         exclude = ["author", "thread"]
         labels = {"content": ""}
+        help_texts = {"content": "You can use markdown"}
         widgets = {
             "content": Bubble(
                 attrs={"spellcheck": "true", "placeholder": "Reply to the topic..."}
             ),
         }
-
-
-from django.core.exceptions import ValidationError
 
 
 class SlugWidget(forms.TextInput):

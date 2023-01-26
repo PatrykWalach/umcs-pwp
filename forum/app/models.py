@@ -77,6 +77,7 @@ class Post(models.Model):
 
     class Meta:
         get_latest_by = "pk"
+        ordering = ("pk",)
 
     def __str__(self) -> str:
         return str(self.pk)
