@@ -3,8 +3,9 @@ from __future__ import annotations
 import re
 
 import django.db.models as models
-from app.models import Post, Thread
+from app.models import Post, Thread, User
 from django import forms
+from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
 from django.core.exceptions import ValidationError
 
 
@@ -32,11 +33,6 @@ class CreatePostForm(forms.ModelForm):
         }
 
 
-class SlugWidget(forms.TextInput):
-    class Media:
-        js = ("widget-slug.js",)
-
-
 class CreateThreadForm(forms.ModelForm):
     class Meta:
         model = Thread
@@ -45,8 +41,13 @@ class CreateThreadForm(forms.ModelForm):
         widgets = {
             # "author": forms.HiddenInput(),
             # "subtopic": forms.HiddenInput(),
-            "slug": SlugWidget(),
             # "content": Bubble(
             #     attrs={"spellcheck": "true", "placeholder": "Replay to the topic..."}
             # )
         }
+
+
+class UserCreationForm(BaseUserCreationForm):
+    class Meta:
+        model = User
+        fields = ("username",)

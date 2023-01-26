@@ -1,5 +1,5 @@
 <div class="btn-group">
-  {% if object_list.number > 1 %}
+  {% if page_obj.number > 1 %}
   <div class="tooltip" data-tip="First page">
     <a
       class="btn btn-ghost rounded-r-none"
@@ -13,15 +13,15 @@
 </div> -->
   {% endif %}
   <!--  -->
-  {% for page in paginator.page_range %} {% if  object_list.number|add:"-5" <= page and page <= object_list.number|add:"5"  %}
+  {% for page in paginator.page_range %} {% if  page_obj.number|add:"-5" <= page and page <= page_obj.number|add:"5"  %}
   <a
     aria-label="Go to page {{page}}"
     href="?page={{page}}"
-    class="btn btn-ghost {% if object_list.number == page %} btn-active {% endif %}"
+    class="btn btn-ghost {% if page_obj.number == page %} btn-active {% endif %}"
   >
     {{page}}
   </a>
-  {% endif %} {% endfor %} {% if object_list.number < paginator.num_pages %}
+  {% endif %} {% endfor %} {% if page_obj.number < paginator.num_pages %}
   <!-- <div class="tooltip" data-tip="Next page">
   <a   class="btn" href="?page={{ page_info.page|add:'1' }}">NEXT</a>
 </div> -->

@@ -1,5 +1,22 @@
 from __future__ import annotations
 
+import re
+import typing
+from dataclasses import dataclass
+
+import django.contrib.auth.views
+import django.db.models
+import django.http
+from app.forms import UserCreationForm
+from app.models import Post, SubTopic, Thread
+from app.views import MainView, SettingsView, ThreadView, TopicView, UserView
+from django.contrib import admin
+from django.db.models import Count, Max, OuterRef, Q, Subquery
+from django.shortcuts import render
+from django.urls import include, path, reverse_lazy
+from django.views.generic import CreateView
+from django.views.generic.base import TemplateView
+
 """app URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -15,32 +32,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from dataclasses import dataclass
-import re
-import django.http
-from django.contrib import admin
-from django.shortcuts import render
-from django.urls import path
-
-
-from django.contrib import admin
-from django.urls import path, include
-from django.views.generic.base import TemplateView
-
-import django.contrib.auth.views
-from django.views.generic import CreateView
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse_lazy
-import typing
-
-from app.models import Post, SubTopic, Thread
-
-import django.db.models
-
-from app.views import MainView, ThreadView, TopicView, UserView
-
-from django.db.models import Q, Count, Subquery, Max, OuterRef
 
 
 urlpatterns = [
@@ -49,20 +40,23 @@ urlpatterns = [
     path("", include("profile.urls")),
     path("", MainView.as_view(), name="main"),
     path("user/<str:username>/", UserView.as_view(), name="user"),
-    path("search/", TemplateView.as_view(template_name="search.html"), name="search"),
     path(
-        "signup/",
+        "search/", TemplateView.as_view(template_name="app/search.html"), name="search"
+    ),
+    path(
+        "register/",
         CreateView.as_view(
             form_class=UserCreationForm,
-            template_name="signup.html",
+            template_name="app/register.html",
             success_url=reverse_lazy("main"),
         ),
-        name="signup",
+        name="register",
     ),
     path("topic/<int:topic_pk>/<slug:topic>/", TopicView.as_view(), name="topic"),
     path("topic/<slug:topic>/", TopicView.as_view(), name="topic"),
+    path("settings", SettingsView.as_view(), name="settings"),
     path(
-        "thread/<int:topic_pk>/<slug:thread>/",
+        "thread/<int:pk>/",
         ThreadView.as_view(),
         name="thread",
     ),

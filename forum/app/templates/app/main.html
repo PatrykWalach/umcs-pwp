@@ -8,7 +8,7 @@
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
     <div class="bg-base-100/30 grid p-8 gap-4">
-      {% regroup subtopics by topic as subtopics_list %}
+      {% regroup object_list by topic as subtopics_list %}
       <!--  -->
       {% for topic, subtopics in subtopics_list %}
       <div class="card bg-base-100">

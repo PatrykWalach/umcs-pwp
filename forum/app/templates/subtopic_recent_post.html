@@ -8,7 +8,8 @@
   <div class="avatar">
     {% load static %} {% static "avatar.gif" as avatar %}
     <div class="w-12 rounded-full">
-      <img src="{{post.author.profile.avatar|default:avatar}}" />
+      <a href="{% url 'user' post.author.username %}" class="contents">
+      <img src="{{post.author.avatar|default:avatar}}" /></a>
     </div>
   </div>
   <div class="truncate">
