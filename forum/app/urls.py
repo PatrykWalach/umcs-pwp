@@ -37,9 +37,8 @@ Including another URLconf
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
-    path("", include("profile.urls")),
     path("", MainView.as_view(), name="main"),
-    path("user/<str:username>/", UserView.as_view(), name="user"),
+    path("user/<str:slug>/", UserView.as_view(), name="user"),
     path(
         "search/", TemplateView.as_view(template_name="app/search.html"), name="search"
     ),

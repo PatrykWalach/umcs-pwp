@@ -44,7 +44,7 @@ class ThreadView(CreateView):
         thread = Thread.objects.get(pk=self.kwargs["pk"])
         posts: Manager[Post] = thread.post_set
 
-        context["thread"] = thread
+        context["object"] = thread
 
         paginator = Paginator(
             posts.order_by("pk").all(),
@@ -86,7 +86,6 @@ class UserView(SingleObjectMixin, ListView):
     paginate_by = 10
     template_name = "app/user.html"
     slug_field = "username"
-    slug_url_kwarg = "username"
     context_object_name = "object"
 
     def get(self, request, *args, **kwargs):
@@ -99,13 +98,8 @@ class UserView(SingleObjectMixin, ListView):
 
 class MainView(ListView):
     template_name = "app/main.html"
-
-    def get_queryset(self) -> QuerySet[typing.Any]:
-        return (
-            SubTopic.objects.filter(topic__topic=None, topic__isnull=False)
-            .annotate(post_count=Count("thread__post"))
-            .order_by("topic")
-        )
+    ordering = ("topic",)
+    queryset = SubTopic.objects.filter(topic__topic=None, topic__isnull=False)
 
 
 class TopicView(CreateView):
@@ -133,7 +127,7 @@ class TopicView(CreateView):
             slug=self.kwargs["topic"], topic__pk=self.kwargs.get("topic_pk", None)
         )
         threads: Manager[Thread] = topic.thread_set
-        context["topic"] = topic
+        context["object"] = topic
 
         paginator = Paginator(
             threads.order_by("-pk").all(),

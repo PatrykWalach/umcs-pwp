@@ -24,6 +24,30 @@ def test_main_page_title(live_server, page: Page):
     expect(page).to_have_title("Forum")
 
 
+def test_thread_title(live_server, page: Page, user: User):
+    # given
+    title = "Title"
+    thread = Thread.objects.create(
+        author=user, subtopic=SubTopic.objects.create(slug="general"), title=title
+    )
+    # when
+    page.goto(live_server.url + thread.get_absolute_url())
+    # then
+    expect(page).to_have_title(title)
+    expect(page.get_by_role("heading", name="Title")).to_have_count(1)
+
+
+def test_topic_title(live_server, page: Page, user: User):
+    # given
+    title = "General"
+    topic = SubTopic.objects.create(slug="general", name=title)
+    # when
+    page.goto(live_server.url + topic.get_absolute_url())
+    # then
+    expect(page).to_have_title(title)
+    expect(page.get_by_role("heading", name=title)).to_have_count(1)
+
+
 def test_navbar_login_navigation(live_server, page: Page):
     # given
     page.goto(live_server.url)

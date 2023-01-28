@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 <!--  -->
-{% block title %} {{thread.title}} {% endblock %}
+{% block title %} {{object.title}} {% endblock %}
 <!--  -->
 {% block main %}
 <!--  -->
@@ -15,7 +15,7 @@
     <div class="bg-base-100/30 grid p-8 gap-4">
       <div class="text-sm breadcrumbs mx-8">
         <ul>
-          {% for topic in thread.subtopic.path %}
+          {% for topic in object.subtopic.path %}
           <li>
             <a
               href="{{ topic.get_absolute_url }}"
@@ -24,7 +24,7 @@
           </li>
           {% endfor %}
 
-          <li>{{thread.title}}</li>
+          <li>{{object.title}}</li>
         </ul>
       </div>
 
@@ -40,27 +40,30 @@
       <section class="card bg-base-100">
         <div class="card-body">
           <div class="card-title">
-            <h1>{{thread.title}}</h1>
+            <h1>{{object.title}}</h1>
           </div>
 
           <div class="flex gap-2">
             <div class="avatar">
               <div class="w-12 rounded-full">
-                <img src="{{thread.author.avatar|default:avatar}}" />
+                <a href="{{object.author.get_absolute_url}}" class="contents">
+                <img src="{{object.author.avatar|default:avatar}}" />
+              </a>
               </div>
             </div>
             <div>
               <div>
-                <strong>By {{ thread.author.username }}</strong>
+                <strong>By <a href="{{object.author.get_absolute_url}}" class="link link-hover">{{ object.author.username }}</a></strong>
               </div>
               {% load humanize %}
-              <time datetime="{{thread.created_at|date:'c'}}"
-                >{{thread.created_at|naturaltime}}</time
+              <time datetime="{{object.created_at|date:'c'}}"
+                >{{object.created_at|naturaltime}}</time
               >
               in
               <a
-                href="/{{thread.subtopic.topic.slug}}/{{thread.subtopic.slug}}/"
-                >{{thread.subtopic.name}}</a
+              class="link link-hover"
+                href="{{object.subtopic.get_absolute_url}}"
+                >{{object.subtopic.name}}</a
               >
             </div>
           </div>

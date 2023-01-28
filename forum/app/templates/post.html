@@ -5,7 +5,7 @@
     <div>
       <h2>
         <strong>
-          <a href="{% url 'user' post.author.username %}" class="link link-hover">
+          <a href="{{ post.author.get_absolute_url }}" class="link link-hover">
             {{post.author.username}}
           </a>
         </strong>

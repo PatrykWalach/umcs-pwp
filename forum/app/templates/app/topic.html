@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 <!--  -->
-{% block title %} {{topic.name}} {% endblock %}
+{% block title %} {{object.name}} {% endblock %}
 <!--  -->
 {% block main %} {% include 'navbar.html' %}
 <!--  -->
@@ -11,9 +11,15 @@
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
     <div class="bg-base-100/30 grid p-8 gap-4">
+      <div class="card bg-base-100">
+        <div class="card-body">
+          <div class="card-title text-4xl"><h1>{{object.name}}</h1></div>
+        </div>
+      </div>
+
       <div class="text-sm breadcrumbs mx-8">
         <ul>
-          {% for topic in topic.path %}
+          {% for topic in object.path %}
           <li>
             <a href="{{ topic.get_absolute_url }}">{{topic.name}}</a>
           </li>
@@ -21,13 +27,14 @@
         </ul>
       </div>
 
+
       <!--  -->
-      {% if topic.subtopic_set.count %}
+      {% if object.subtopic_set.count %}
       <div class="card bg-base-100">
         <div class="card-body">
           <div class="card-title !text-2xl">Subtopics</div>
           <ul class="divide-y gap-2 grid divide-base-content/20">
-            {% for subtopic in topic.subtopic_set.all %}
+            {% for subtopic in object.subtopic_set.all %}
             <li>
               <div
                 class="grid grid-cols-[auto_minmax(0,1fr)_auto] pt-2 gap-4 md:gap-8 items-start"
@@ -66,7 +73,7 @@
                   By
                   <a
                     class="link link-hover"
-                    href="{url 'user' thread.author.username}"
+                    href="{{thread.author.get_absolute_url}}"
                     >{{thread.author.username}}</a
                   >,
                   <time datetime="{{created_at|date:'c'}}"
@@ -84,12 +91,12 @@
                   {% for post in thread.post_set.all.reverse|slice:":3:" %}
                   <li>
                     <!-- -->
-                    <div class="avatar shadow shadow-base-content/80 -rotate-90 rounded-full">
+                    <div
+                      class="avatar shadow shadow-base-content/80 -rotate-90 rounded-full"
+                    >
                       <div class="w-10 rounded-full rotate-90">
                         <a href="{{post.get_absolute_url}}" class="contents">
-                          <img
-                            src="{{post.author.avatar|default:avatar}}"
-                          />
+                          <img src="{{post.author.avatar|default:avatar}}" />
                         </a>
                       </div>
                     </div>
