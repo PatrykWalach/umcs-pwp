@@ -28,6 +28,9 @@ class ThreadView(CreateView):
     template_name = "app/thread.html"
     form_class = CreatePostForm
 
+    def get_form_kwargs(self) -> Dict[str, Any]:
+        return super().get_form_kwargs() | {"user": self.request.user}
+
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.thread = Thread.objects.get(pk=self.kwargs["pk"])

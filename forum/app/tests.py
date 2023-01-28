@@ -7,6 +7,7 @@ import pytest
 from app.models import Post, SubTopic, Thread, User
 from django.urls import reverse
 from django.utils.text import slugify
+
 from playwright.sync_api import Page, expect
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
@@ -57,7 +58,7 @@ def test_navbar_login_navigation(live_server, page: Page):
     expect(page).to_have_url(re.compile(reverse("login")))
 
 
-def test_navbar_viewer_avatar(live_server, user: User, page: Page):
+def test_navbar_user_avatar(live_server, user: User, page: Page):
     # given
     avatar = "https://media.giphy.com/media/a6pzK009rlCak/giphy.gif"
     user.avatar = avatar
@@ -179,6 +180,23 @@ def test_post_create_preview(live_server, page: Page, user: User):
     # expect(page.get_by_role("listitem", name="item 2")).to_have_count(1)
     assert Post.objects.count() == 0
 
+
+def test_bubble_user_avatar(live_server, page: Page, user: User):
+    # given
+    thread = Thread.objects.create(
+        author=user,
+        slug="user-thread",
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    profile = Profile.objects.create(user=user, avatar="http://www.test.com/avatar.png")
+
+    # when
+    page.goto(live_server.url + thread.get_absolute_url())
+    # then
+    assert (
+        page.get_by_role("form").get_by_role("img").get_attribute("src")
+        == profile.avatar
+    )
 
 def test_post_create_anonymous(live_server, page: Page, django_user_model):
     # given

@@ -6,6 +6,7 @@ import django.db.models as models
 from app.models import Post, Thread, User
 from django import forms
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
+
 from django.core.exceptions import ValidationError
 
 
@@ -19,6 +20,9 @@ class PostForm(forms.ModelForm):
 class Bubble(forms.Textarea):
     template_name = "django/forms/widgets/bubble.html"
 
+    def get_context(self, *args, **kwargs) -> Dict[str, Any]:
+        return super().get_context(*args, **kwargs) | {"user": self.user}
+
 
 class CreatePostForm(forms.ModelForm):
     class Meta:
@@ -31,6 +35,16 @@ class CreatePostForm(forms.ModelForm):
                 attrs={"spellcheck": "true", "placeholder": "Reply to the topic..."}
             ),
         }
+
+    def __init__(self, *args, **kwargs) -> None:
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        self.fields["content"].widget.user = user
+
+
+class SlugWidget(forms.TextInput):
+    class Media:
+        js = ("widget-slug.js",)
 
 
 class CreateThreadForm(forms.ModelForm):
