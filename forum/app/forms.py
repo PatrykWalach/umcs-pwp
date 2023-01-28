@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import re
-from django import forms
-from app.models import (
-    Post,
-    Thread,
-)
+
 import django.db.models as models
+from app.models import Post, Thread
+from django import forms
+from django.core.exceptions import ValidationError
 
 
 class PostForm(forms.ModelForm):
@@ -16,6 +17,9 @@ class PostForm(forms.ModelForm):
 
 class Bubble(forms.Textarea):
     template_name = "django/forms/widgets/bubble.html"
+
+    def get_context(self, *args, **kwargs) -> Dict[str, Any]:
+        return super().get_context(*args, **kwargs) | {"user": self.user}
 
 
 class CreatePostForm(forms.ModelForm):
@@ -29,8 +33,10 @@ class CreatePostForm(forms.ModelForm):
             ),
         }
 
-
-from django.core.exceptions import ValidationError
+    def __init__(self, *args, **kwargs) -> None:
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        self.fields["content"].widget.user = user
 
 
 class SlugWidget(forms.TextInput):
