@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 <!--  -->
-{% block title %} {{topic.name}} {% endblock %}
+{% block title %} {{object.name}} {% endblock %}
 <!--  -->
 {% block main %} {% include 'navbar.html' %}
 <!--  -->
@@ -11,39 +11,48 @@
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
     <div class="bg-base-100/30 grid p-8 gap-4">
-      <div class="text-sm breadcrumbs ml-8">
+      <div class="card bg-base-100">
+        <div class="card-body">
+          <div class="card-title text-4xl"><h1>{{object.name}}</h1></div>
+        </div>
+      </div>
+
+      <div class="text-sm breadcrumbs mx-8">
         <ul>
-          {% for topic in topic.path %}
+          {% for topic in object.path %}
           <li>
-            <a
-              href="{{ topic.get_absolute_url }}"
-              >{{topic.name}}</a
-            >
+            <a href="{{ topic.get_absolute_url }}">{{topic.name}}</a>
           </li>
           {% endfor %}
         </ul>
       </div>
 
+
       <!--  -->
-      {% if topic.subtopic_set.count %}
+      {% if object.subtopic_set.count %}
       <div class="card bg-base-100">
         <div class="card-body">
           <div class="card-title !text-2xl">Subtopics</div>
           <ul class="divide-y gap-2 grid divide-base-content/20">
-            {% for subtopic in topic.subtopic_set.all %}
-
-            <li>{% include 'subtopic.html' %}</li>
+            {% for subtopic in object.subtopic_set.all %}
+            <li>
+              <div
+                class="grid grid-cols-[auto_minmax(0,1fr)_auto] pt-2 gap-4 md:gap-8 items-start"
+              >
+                {% include 'subtopic.html' %}
+                <!--  -->
+                {% include 'subtopic_recent_post.html' %}
+                <!--  -->
+                {% include 'subtopic_post_count.html' %}
+              </div>
+            </li>
             {% endfor%}
           </ul>
         </div>
       </div>
 
-      {% endif %}
-      
-      {% if paginator.num_pages > 1 %}
-      <div class="ml-8">
-        {% include 'pagination.html' %}
-      </div>
+      {% endif %} {% if paginator.num_pages > 1 %}
+      <div class="flex justify-center">{% include 'pagination.html' %}</div>
       {% endif %}
 
       <div class="card bg-base-100">
@@ -64,7 +73,7 @@
                   By
                   <a
                     class="link link-hover"
-                    href="{url 'user' thread.author.username}"
+                    href="{{thread.author.get_absolute_url}}"
                     >{{thread.author.username}}</a
                   >,
                   <time datetime="{{created_at|date:'c'}}"
@@ -76,30 +85,30 @@
                   repl{{thread.post_set.count|pluralize:'y,ies'}}
                 </div>
               </div>
-              {% with post=thread.post_set.latest %} {% if post %}
               <div class="flex flex-col items-center text-center gap-2">
-                <!-- -->
-
                 {% load static %} {% static "avatar.gif" as avatar %}
-                <div class="avatar">
-                  <div class="w-12 rounded-full">
-                    <a
-                      href="{{post.get_absolute_url}}"
-                      class="contents"
+                <ul class="flex -space-x-5 space-x-reverse flex-row-reverse">
+                  {% for post in thread.post_set.all.reverse|slice:":3:" %}
+                  <li>
+                    <!-- -->
+                    <div
+                      class="avatar shadow shadow-base-content/80 -rotate-90 rounded-full"
                     >
-                      <img
-                        src="{{post.author.profile.avatar|default:avatar}}"
-                      />
-                    </a>
-                  </div>
-                </div>
+                      <div class="w-10 rounded-full rotate-90">
+                        <a href="{{post.get_absolute_url}}" class="contents">
+                          <img src="{{post.author.avatar|default:avatar}}" />
+                        </a>
+                      </div>
+                    </div>
+                  </li>
+                  {%endfor%}
+                </ul>
                 <div class="text-xs">
                   <time datetime="{{created_at|date:'c'}}"
-                    >{{post.created_at|naturaltime}}</time
+                    >{{thread.post_set.latest.created_at|naturaltime}}</time
                   >
                 </div>
               </div>
-              {%endif %} {%endwith%}
             </li>
             {% endfor%}
           </ul>
@@ -108,10 +117,8 @@
       </div>
 
       {% if paginator.num_pages > 1 %}
-      <div class="ml-8">
-        {% include 'pagination.html' %}
-      </div>
-      {%  endif %} 
+      <div class="flex justify-center">{% include 'pagination.html' %}</div>
+      {% endif %}
 
       <div class="card bg-base-100">
         <div class="card-body">
@@ -130,14 +137,14 @@
 
           <div class="text-center grid prose max-w-none">
             <div class="">
-              <h2>Create an account or sign in to comment</h2>
-              <p>You need to be a member in order to leave a comment</p>
+              <h2>Create an account or sign in to create new thread</h2>
+              <p>You need to be a member in order to create a new thread</p>
             </div>
             <div class="flex justify-evenly">
               <div class="">
                 <h2>Create an account</h2>
                 <p>Sign up for a new account in our community. It's easy!</p>
-                <a href="{%url 'signup' %}" class="btn btn-wide"
+                <a href="{%url 'register' %}" class="btn btn-wide"
                   >Register a new account</a
                 >
               </div>

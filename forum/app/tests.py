@@ -4,12 +4,18 @@ import os
 import re
 
 import pytest
-from app.models import Post, Profile, SubTopic, Thread
-from django.contrib.auth.models import User
+from app.models import Post, SubTopic, Thread, User
 from django.urls import reverse
+from django.utils.text import slugify
+
 from playwright.sync_api import Page, expect
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
+
+@pytest.fixture(autouse=True)
+def set_default_navigation_timeout(page: Page):
+    page.set_default_navigation_timeout(3000)
 
 
 def test_main_page_title(live_server, page: Page):
@@ -17,6 +23,30 @@ def test_main_page_title(live_server, page: Page):
     page.goto(live_server.url)
     # then
     expect(page).to_have_title("Forum")
+
+
+def test_thread_title(live_server, page: Page, user: User):
+    # given
+    title = "Title"
+    thread = Thread.objects.create(
+        author=user, subtopic=SubTopic.objects.create(slug="general"), title=title
+    )
+    # when
+    page.goto(live_server.url + thread.get_absolute_url())
+    # then
+    expect(page).to_have_title(title)
+    expect(page.get_by_role("heading", name="Title")).to_have_count(1)
+
+
+def test_topic_title(live_server, page: Page, user: User):
+    # given
+    title = "General"
+    topic = SubTopic.objects.create(slug="general", name=title)
+    # when
+    page.goto(live_server.url + topic.get_absolute_url())
+    # then
+    expect(page).to_have_title(title)
+    expect(page.get_by_role("heading", name=title)).to_have_count(1)
 
 
 def test_navbar_login_navigation(live_server, page: Page):
@@ -30,12 +60,14 @@ def test_navbar_login_navigation(live_server, page: Page):
 
 def test_navbar_user_avatar(live_server, user: User, page: Page):
     # given
-    profile = Profile.objects.create(avatar="http://www.test.com/avatar.png", user=user)
+    avatar = "https://media.giphy.com/media/a6pzK009rlCak/giphy.gif"
+    user.avatar = avatar
+    user.save()
     # when
     page.goto(live_server.url)
     # then
     expect(page.get_by_role("navigation").get_by_role("img")).to_have_attribute(
-        "src", profile.avatar
+        "src", avatar
     )
 
 
@@ -50,10 +82,10 @@ def test_navbar_viewer_default_avatar(live_server, user: User, page: Page):
 
 @pytest.fixture
 def user(live_server, page: Page, django_user_model):
-    user = django_user_model.objects.create_user(username="user", password="user")
+    password = "user"
+    user = django_user_model.objects.create_user(username="user", password=password)
     page.goto(live_server.url + reverse("login"))
 
-    password = "user"
     page.get_by_role("textbox", name="Username:").type(user.username)
     page.get_by_role("textbox", name="Password:").type(password)
     page.get_by_role("button", name="Login").click()
@@ -79,7 +111,7 @@ def test_login(live_server, page: Page, django_user_model):
 
 def test_duplicate_username(live_server, page: Page, django_user_model):
     # given
-    page.goto(live_server.url + reverse("signup"))
+    page.goto(live_server.url + reverse("register"))
 
     password = "user"
     user = django_user_model.objects.create_user(username="user", password=password)
@@ -90,14 +122,29 @@ def test_duplicate_username(live_server, page: Page, django_user_model):
     # when
     page.get_by_role("button", name="Register").click()
     # then
-    page.get_by_text("A user with that username already exsists.")
+    expect(page.get_by_text("A user with that username already exists.")).to_have_count(
+        1
+    )
+
+
+def test_thread_create(live_server, page: Page, user):
+    # given
+    topic = SubTopic.objects.create(slug="general")
+    page.goto(live_server.url + topic.get_absolute_url())
+    title = "Title"
+    page.get_by_label("Title:").type(title)
+    # when
+    page.get_by_role("button", name="create thread").click()
+    # then
+    assert Thread.objects.get().subtopic == topic
+    assert Thread.objects.get().author == user
+    assert Thread.objects.get().title == title
 
 
 def test_post_create(live_server, page: Page, user: User):
     # given
     thread = Thread.objects.create(
         author=user,
-        slug="user-thread",
         subtopic=SubTopic.objects.create(slug="general"),
     )
     page.goto(live_server.url + thread.get_absolute_url())
@@ -107,9 +154,9 @@ def test_post_create(live_server, page: Page, user: User):
     # when
     page.get_by_role("button", name="Submit").click()
     # then
-    page.get_by_role("heading", name="Title")
-    page.get_by_role("listitem", name="item 1")
-    page.get_by_role("listitem", name="item 2")
+    expect(page.get_by_role("heading", name="Title")).to_have_count(1)
+    # expect(page.get_by_role("listitem", name="item 1")).to_have_count(1)
+    # expect(page.get_by_role("listitem", name="item 2")).to_have_count(1)
     assert Post.objects.get().content == "# Title\r\n\r\n - item 1\r\n - item 2"
     assert Post.objects.get().author == user
     assert Post.objects.get().thread == thread
@@ -119,7 +166,6 @@ def test_post_create_preview(live_server, page: Page, user: User):
     # given
     thread = Thread.objects.create(
         author=user,
-        slug="user-thread",
         subtopic=SubTopic.objects.create(slug="general"),
     )
     page.goto(live_server.url + thread.get_absolute_url())
@@ -129,9 +175,9 @@ def test_post_create_preview(live_server, page: Page, user: User):
     # when
     page.get_by_role("button", name="Preview").click()
     # then
-    page.get_by_role("heading", name="Title")
-    page.get_by_role("listitem", name="item 1")
-    page.get_by_role("listitem", name="item 2")
+    expect(page.get_by_role("heading", name="Title")).to_have_count(1)
+    # expect(page.get_by_role("listitem", name="item 1")).to_have_count(1)
+    # expect(page.get_by_role("listitem", name="item 2")).to_have_count(1)
     assert Post.objects.count() == 0
 
 
@@ -151,3 +197,90 @@ def test_bubble_user_avatar(live_server, page: Page, user: User):
         page.get_by_role("form").get_by_role("img").get_attribute("src")
         == profile.avatar
     )
+
+def test_post_create_anonymous(live_server, page: Page, django_user_model):
+    # given
+    thread = Thread.objects.create(
+        author=django_user_model.objects.create_user(username="user"),
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    # when
+    page.goto(live_server.url + thread.get_absolute_url())
+    # then
+    expect(
+        page.get_by_text("You need to be a member in order to leave a comment")
+    ).to_have_count(1)
+
+
+def test_thread_create_anonymous(live_server, page: Page, django_user_model):
+    # given
+    topic = SubTopic.objects.create(slug="general")
+    # when
+    page.goto(live_server.url + topic.get_absolute_url())
+    # then
+    expect(
+        page.get_by_text("You need to be a member in order to create a new thread")
+    ).to_have_count(1)
+
+
+def test_post_pagination_navigation(live_server, page: Page, user: User):
+    # given
+    thread = Thread.objects.create(
+        author=user,
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    Post.objects.bulk_create(
+        Post(thread=thread, author=user, content="# Test") for _ in range(100)
+    )
+    page.goto(live_server.url + thread.get_absolute_url())
+    # when
+    page.get_by_role("link", name="Go to page 2").first.click()
+    # then
+    expect(page).to_have_url(live_server.url + thread.get_absolute_url() + "?page=2")
+
+
+def test_post_pagination_initial(live_server, page: Page, user: User):
+    # given
+    thread = Thread.objects.create(
+        author=user,
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    Post.objects.bulk_create(
+        Post(thread=thread, author=user, content="# Test") for _ in range(100)
+    )
+    # when
+    page.goto(live_server.url + thread.get_absolute_url())
+    # then
+    expect(page.get_by_role("heading", name="Test")).to_have_count(10)
+    expect(page.get_by_role("link", name="Go to first page")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to page -1")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to page 0")).to_have_count(0)
+    for i in range(1, 7):
+        expect(page.get_by_role("link", name=f"Go to page {i}")).to_have_count(2)
+    expect(page.get_by_role("link", name="Go to page 7")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to last page")).to_have_count(2)
+
+
+def test_post_pagination(live_server, page: Page, user: User):
+    # given
+    thread = Thread.objects.create(
+        author=user,
+        subtopic=SubTopic.objects.create(slug="general"),
+    )
+    Post.objects.bulk_create(
+        Post(thread=thread, author=user, content="# Test") for _ in range(100)
+    )
+    # when
+    page.goto(live_server.url + thread.get_absolute_url() + "?page=7")
+    # then
+    expect(page.get_by_role("heading", name="Test")).to_have_count(10)
+    expect(page.get_by_role("link", name="Go to first page")).to_have_count(2)
+    for i in range(-1, 2):
+        expect(
+            page.get_by_role("link", exact=True, name=f"Go to page {i}")
+        ).to_have_count(0)
+    for i in range(2, 11):
+        expect(page.get_by_role("link", name=f"Go to page {i}")).to_have_count(2)
+    expect(page.get_by_role("link", name="Go to page 11")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to page 12")).to_have_count(0)
+    expect(page.get_by_role("link", name="Go to last page")).to_have_count(2)

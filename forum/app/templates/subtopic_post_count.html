@@ -1,0 +1,7 @@
+{% load humanize %}
+
+<div class="stat p-0 text-right">
+  <!-- <div class="stat-title">Posts</div> -->
+  <div class="stat-value">{{subtopic.post_count|intword}}</div>
+  <div class="stat-desc">post{{subtopic.post_count|pluralize}}</div>
+</div>
