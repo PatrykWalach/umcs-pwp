@@ -6,7 +6,7 @@ from email.headerregistry import UniqueAddressHeader
 
 import django.db.models as models
 from django.contrib.auth.models import AbstractUser
-from django.db.models import F, Q
+from django.db.models import Count, F, Q
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import RowNumber
 from django.urls import reverse
@@ -17,7 +17,7 @@ class User(AbstractUser):
     avatar = models.URLField()
 
     def get_absolute_url(self) -> str:
-        return reverse("user", kwargs={"username": self.username})
+        return reverse("user", kwargs={"slug": self.username})
 
     class Meta:
         db_table = "auth_user"
@@ -46,6 +46,9 @@ class SubTopic(models.Model):
 
         return path + [self]
 
+    def post_count(self):
+        return self.thread_set.aggregate(Count("post"))["post__count"]
+
     def get_absolute_url(self):
         if self.topic == None:
             return reverse("topic", kwargs={"topic": self.slug})
@@ -61,9 +64,6 @@ class Thread(models.Model):
 
     def __str__(self) -> str:
         return f"{str(self.subtopic)}{self.pk}/"
-
-    def post_count(self):
-        return self.post_set.count()
 
     def get_absolute_url(self):
         return reverse("thread", kwargs={"pk": self.pk})
