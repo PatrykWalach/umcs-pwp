@@ -7,7 +7,7 @@
 {% load humanize %}
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
-    <div class="bg-base-100/30 grid p-8 gap-4">
+    <div class="bg-base-100/30 flex flex-col min-h-[calc(100vh-66px)] p-8 gap-4">
       {% regroup object_list by topic as subtopics_list %}
       <!--  -->
       {% for topic, subtopics in subtopics_list %}

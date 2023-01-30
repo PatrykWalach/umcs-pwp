@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import os
 import re
+from datetime import datetime
 
 import pytest
 from app.models import Post, SubTopic, Thread, User
 from django.urls import reverse
 from django.utils.text import slugify
+from django.utils.timezone import datetime
 from playwright.sync_api import Page, expect
 from pytest_django.live_server_helper import LiveServer
 
@@ -248,6 +250,33 @@ def test_thread_create_anonymous(
     expect(
         page.get_by_text("You need to be a member in order to create a new thread")
     ).to_have_count(1)
+
+
+def test_user_last_active(live_server: LiveServer, page: Page, user: User) -> None:
+    # given
+    subtopic = SubTopic.objects.create()
+    thread = Thread.objects.create(author=user, subtopic=subtopic)
+    post = Post.objects.create(author=user, thread=thread)
+    # when
+    page.goto(live_server.url + user.get_absolute_url())
+    # then
+
+    expect(page.get_by_text("Last active ").get_by_role("time")).to_have_attribute(
+        "datetime", (post.created_at.isoformat())
+    )
+
+
+def test_user_posts(live_server: LiveServer, page: Page, user: User) -> None:
+    # given
+    subtopic = SubTopic.objects.create()
+    thread = Thread.objects.create(author=user, subtopic=subtopic)
+    Post.objects.create(author=user, thread=thread, content="# Foo")
+    Post.objects.create(author=user, thread=thread, content="# Bar")
+    # when
+    page.goto(live_server.url + user.get_absolute_url())
+    # then
+    expect(page.get_by_role("heading", name="Foo")).to_have_count(1)
+    expect(page.get_by_role("heading", name="Bar")).to_have_count(1)
 
 
 def test_post_pagination_navigation(
