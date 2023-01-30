@@ -51,12 +51,12 @@ urlpatterns = [
         ),
         name="register",
     ),
-    path("topic/<int:topic_pk>/<slug:topic>/", TopicView.as_view(), name="topic"),
-    path("topic/<slug:topic>/", TopicView.as_view(), name="topic"),
+    path("topic/<int:topic_pk>/<slug:slug>/", TopicView, name="topic"),
+    path("topic/<slug:slug>/", TopicView, name="topic"),
     path("settings", SettingsView.as_view(), name="settings"),
     path(
         "thread/<int:pk>/",
-        ThreadView.as_view(),
+        ThreadView,
         name="thread",
     ),
 ]

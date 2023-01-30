@@ -14,6 +14,8 @@ from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.db.models import Count, Manager, Max, Model, OuterRef, Q, Subquery
 from django.db.models.query import QuerySet
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, FormView, ListView
@@ -24,49 +26,41 @@ from django.views.generic.edit import UpdateView
 T = typing.TypeVar("T", bound=Model)
 
 
-class ThreadView(CreateView):
-    template_name = "app/thread.html"
-    form_class = CreatePostForm
+def ThreadView(request: HttpRequest, pk: int) -> HttpResponse:
+    thread = get_object_or_404(Thread, pk=pk)
+    form = CreatePostForm(
+        user=request.user, initial={"content": request.GET.get("content")}
+    )
 
-    def get_form_kwargs(self) -> Dict[str, Any]:
-        return super().get_form_kwargs() | {"user": self.request.user}
+    if request.method == "POST" and (form := CreatePostForm(request.POST)).is_valid():
+        form.instance.author = request.user
+        form.instance.thread = thread
+        form.save()
+        return redirect(form.instance.get_absolute_url())
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        form.instance.thread = Thread.objects.get(pk=self.kwargs["pk"])
-        return super().form_valid(form)
+    paginator = Paginator(
+        thread.post_set.order_by("pk").all(),
+        10,
+    )
 
-    def get_initial(self) -> typing.Dict[str, typing.Any]:
-        return {
-            "content": self.request.GET.get("content"),
-        }
+    page_obj = paginator.page(request.GET.get("page", 1))
 
-    def get_context_data(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        context = super().get_context_data(**self.kwargs)
-
-        thread = Thread.objects.get(pk=self.kwargs["pk"])
-        posts: Manager[Post] = thread.post_set
-
-        context["object"] = thread
-
-        paginator = Paginator(
-            posts.order_by("pk").all(),
-            10,
-        )
-        page = self.request.GET.get("page", 1)
-        context["paginator"] = paginator
-        page_obj = paginator.page(page)
-        context["page_obj"] = page_obj
-        context["object_list"] = page_obj.object_list
-        context["page"] = page
-
-        context["preview"] = {
-            "created_at": django.utils.timezone.now(),
-            "content": self.request.GET.get("content"),
-            "author": self.request.user,
-        }
-
-        return context
+    return render(
+        request,
+        "app/thread.html",
+        {
+            "object": thread,
+            "paginator": paginator,
+            "page_obj": page_obj,
+            "object_list": page_obj.object_list,
+            "form": form,
+            "preview": {
+                "created_at": django.utils.timezone.now(),
+                "content": request.GET.get("content"),
+                "author": request.user,
+            },
+        },
+    )
 
 
 class SettingsView(LoginRequiredMixin, UpdateView):
@@ -105,44 +99,33 @@ class MainView(ListView):
     queryset = SubTopic.objects.filter(topic__topic=None, topic__isnull=False)
 
 
-class TopicView(CreateView):
-    template_name = "app/topic.html"
-    form_class = CreateThreadForm
-    # model = Thread
-    # fields = ["title"]
+def TopicView(
+    request: HttpRequest, slug: str, topic_pk: int | None = None
+) -> HttpResponse:
+    subtopic = get_object_or_404(SubTopic, slug=slug, topic__pk=topic_pk)
+    form = CreateThreadForm()
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        form.instance.subtopic = SubTopic.objects.get(
-            slug=self.kwargs["topic"], topic__pk=self.kwargs.get("topic_pk", None)
-        )
-        return super().form_valid(form)
+    if request.method == "POST" and (form := CreateThreadForm(request.POST)).is_valid():
+        form.instance.author = request.user
+        form.instance.subtopic = subtopic
+        form.save()
+        return redirect(form.instance.get_absolute_url())
 
-    def get_initial(self) -> typing.Dict[str, typing.Any]:
-        return {
-            "slug": self.request.GET.get("slug"),
-        }
+    paginator = Paginator(
+        subtopic.thread_set.order_by("-pk").all(),
+        10,
+    )
 
-    def get_context_data(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        context = super().get_context_data(**kwargs)
+    page_obj = paginator.page(request.GET.get("page", 1))
 
-        topic = SubTopic.objects.get(
-            slug=self.kwargs["topic"], topic__pk=self.kwargs.get("topic_pk", None)
-        )
-        threads: Manager[Thread] = topic.thread_set
-        context["object"] = topic
-
-        paginator = Paginator(
-            threads.order_by("-pk").all(),
-            10,
-        )
-
-        page = self.request.GET.get("page", 1)
-        page_obj = paginator.page(page)
-
-        context["paginator"] = paginator
-        context["page_obj"] = page_obj
-        context["object_list"] = page_obj.object_list
-        context["page"] = page
-
-        return context
+    return render(
+        request,
+        "app/topic.html",
+        {
+            "object": subtopic,
+            "paginator": paginator,
+            "page_obj": page_obj,
+            "object_list": page_obj.object_list,
+            "form": form,
+        },
+    )

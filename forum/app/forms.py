@@ -6,7 +6,6 @@ import django.db.models as models
 from app.models import Post, Thread, User
 from django import forms
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
-
 from django.core.exceptions import ValidationError
 
 
@@ -40,11 +39,6 @@ class CreatePostForm(forms.ModelForm):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         self.fields["content"].widget.user = user
-
-
-class SlugWidget(forms.TextInput):
-    class Media:
-        js = ("widget-slug.js",)
 
 
 class CreateThreadForm(forms.ModelForm):
