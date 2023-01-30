@@ -9,16 +9,29 @@
 {% load humanize %} {% load static %} {% static 'avatar.gif' as avatar %}
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
-    <div class="bg-base-100/30 grid p-8 gap-4">
+    <div
+      class="bg-base-100/30 flex flex-col min-h-[calc(100vh-66px)] p-8 gap-4"
+    >
       <div class="card bg-base-200">
         <div class="card-body relative items-center">
-          <div class="avatar">
-            <div class="w-24 rounded-full shadow-2xl">
-              <img src="{{user.avatar|default:avatar}}" />
+          <div
+            class="tooltip"
+            data-tip="Joined {{object.date_joined|naturaltime}}"
+          >
+            <div class="avatar">
+              <div class="w-24 rounded-full shadow-2xl">
+                <img src="{{user.avatar|default:avatar}}" />
+              </div>
             </div>
           </div>
           <div>
             <h1 class="text-5xl font-bold">{{user.username}}</h1>
+          </div>
+          <div>
+            Last active
+            <time datetime="{{user.post_set.latest.created_at|date:'c'}}">
+              {{user.post_set.latest.created_at|naturaltime}}
+            </time>
           </div>
         </div>
       </div>
@@ -26,11 +39,12 @@
       <div class="card bg-base-200">
         <div class="card-body relative items-center">
           <form method="POST">
-            {% csrf_token %}
-            {{form.as_div}} 
+            {% csrf_token %} {{form.as_div}}
 
             <div class="form-control mt-6">
-              <button class="btn btn-primary" type="submit">Update profile</button>
+              <button class="btn btn-primary" type="submit">
+                Update profile
+              </button>
             </div>
           </form>
         </div>

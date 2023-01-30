@@ -90,7 +90,7 @@ class UserView(SingleObjectMixin, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.object.post_set.all()
+        return self.object.post_set.all().order_by("-pk")
 
 
 class MainView(ListView):
