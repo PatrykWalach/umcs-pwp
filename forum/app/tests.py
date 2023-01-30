@@ -219,6 +219,24 @@ def test_post_create_anonymous(
     ).to_have_count(1)
 
 
+def test_user_remove(live_server: LiveServer, page: Page, user: User) -> None:
+    # given
+    page.goto(live_server.url + reverse("settings"))
+    page.get_by_text("Remove account").click()
+    # when
+    page.get_by_role("button", name="Yes").click()
+    # then
+    page.goto(live_server.url + reverse("login"))
+    page.get_by_role("textbox", name="Username:").type(user.username)
+    page.get_by_role("textbox", name="Password:").type("user")
+    page.get_by_role("button", name="Login").click()
+    expect(
+        page.get_by_text(
+            "Please enter a correct username and password. Note that both fields may be case-"
+        )
+    ).to_have_count(1)
+
+
 def test_thread_create_anonymous(
     live_server: LiveServer, page: Page, django_user_model: type[User]
 ) -> None:

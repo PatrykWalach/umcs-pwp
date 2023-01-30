@@ -9,7 +9,14 @@ import django.db.models
 import django.http
 from app.forms import UserCreationForm
 from app.models import Post, SubTopic, Thread
-from app.views import MainView, SettingsView, ThreadView, TopicView, UserView
+from app.views import (
+    MainView,
+    SettingsView,
+    ThreadView,
+    TopicView,
+    UserRemoveView,
+    UserView,
+)
 from django.contrib import admin
 from django.db.models import Count, Max, OuterRef, Q, Subquery
 from django.shortcuts import render
@@ -39,6 +46,7 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path("", MainView.as_view(), name="main"),
     path("user/<str:slug>/", UserView.as_view(), name="user"),
+    path("user/", UserRemoveView, name="user-remove"),
     path(
         "search/", TemplateView.as_view(template_name="app/search.html"), name="search"
     ),

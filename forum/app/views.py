@@ -8,6 +8,7 @@ import django.utils.timezone
 from app.forms import CreatePostForm, CreateThreadForm
 from app.models import Post, SubTopic, Thread, User
 from django import forms
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
@@ -97,6 +98,16 @@ class MainView(ListView):
     template_name = "app/main.html"
     ordering = ("topic",)
     queryset = SubTopic.objects.filter(topic__topic=None, topic__isnull=False)
+
+
+def UserRemoveView(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        request.user.is_active = False
+        request.user.save()
+        logout(request)
+        return redirect("main")
+
+    return redirect("settings")
 
 
 def TopicView(
