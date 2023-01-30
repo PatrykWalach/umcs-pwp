@@ -4,6 +4,24 @@
 <!--  -->
 {% load md%}
 <!--  -->
+{% block html %}
+<input type="checkbox" id="confirm-removal" class="modal-toggle" />
+<label for="confirm-removal" class="modal cursor-pointer">
+  <label class="modal-box relative" for="">
+    <h3 class="font-bold text-lg">Do you want to remove your account!</h3>
+    <p class="py-4">You will permanently lose access to your account.</p>
+    <form class="modal-action" method="post" action="{%url 'user-remove'%}">
+      {% csrf_token %}
+      <label for="confirm-removal" class="btn">No</label>
+      <label for="confirm-removal" class="btn btn-primary">
+        <button type="submit">Yes</button>
+      </label>
+    </form>
+  </label>
+</label>
+
+{% endblock %}
+<!--  -->
 {% block main %} {% include 'navbar.html' %}
 <!--  -->
 {% load humanize %} {% load static %} {% static 'avatar.gif' as avatar %}
@@ -46,7 +64,17 @@
                 Update profile
               </button>
             </div>
+
+
+            <div class="form-control mt-24">
+              <label for="confirm-removal" class="btn btn-error"
+              >Remove account</label>
+            </div>
           </form>
+
+        
+
+       
         </div>
       </div>
     </div>
