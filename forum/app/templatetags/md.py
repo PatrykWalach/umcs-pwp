@@ -1,6 +1,7 @@
-from django import template
-from django.template.defaultfilters import stringfilter
+from __future__ import annotations
 
+from django import template
+from django.template.defaultfilters import escape, stringfilter
 from markdown import markdown
 
 register = template.Library()
@@ -10,6 +11,6 @@ register = template.Library()
 @stringfilter
 def md(value):
     return markdown(
-        value,
+        escape(value),
         extensions=["markdown.extensions.tables", "markdown.extensions.fenced_code"],
     )

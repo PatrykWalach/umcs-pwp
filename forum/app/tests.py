@@ -7,25 +7,25 @@ import pytest
 from app.models import Post, SubTopic, Thread, User
 from django.urls import reverse
 from django.utils.text import slugify
-
 from playwright.sync_api import Page, expect
+from pytest_django.live_server_helper import LiveServer
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 
 @pytest.fixture(autouse=True)
-def set_default_navigation_timeout(page: Page):
+def set_default_navigation_timeout(page: Page) -> None:
     page.set_default_navigation_timeout(3000)
 
 
-def test_main_page_title(live_server, page: Page):
+def test_main_page_title(live_server: LiveServer, page: Page) -> None:
     # when
     page.goto(live_server.url)
     # then
     expect(page).to_have_title("Forum")
 
 
-def test_thread_title(live_server, page: Page, user: User):
+def test_thread_title(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     title = "Title"
     thread = Thread.objects.create(
@@ -38,7 +38,7 @@ def test_thread_title(live_server, page: Page, user: User):
     expect(page.get_by_role("heading", name="Title")).to_have_count(1)
 
 
-def test_topic_title(live_server, page: Page, user: User):
+def test_topic_title(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     title = "General"
     topic = SubTopic.objects.create(slug="general", name=title)
@@ -49,7 +49,7 @@ def test_topic_title(live_server, page: Page, user: User):
     expect(page.get_by_role("heading", name=title)).to_have_count(1)
 
 
-def test_navbar_login_navigation(live_server, page: Page):
+def test_navbar_login_navigation(live_server: LiveServer, page: Page) -> None:
     # given
     page.goto(live_server.url)
     # when
@@ -58,12 +58,11 @@ def test_navbar_login_navigation(live_server, page: Page):
     expect(page).to_have_url(re.compile(reverse("login")))
 
 
-def test_navbar_user_avatar(live_server, user: User, page: Page):
+def test_navbar_user_avatar(live_server: LiveServer, user: User, page: Page) -> None:
     # given
     avatar = "https://media.giphy.com/media/a6pzK009rlCak/giphy.gif"
     user.avatar = avatar
-    user.save()
-    # when
+    user.save()  # when
     page.goto(live_server.url)
     # then
     expect(page.get_by_role("navigation").get_by_role("img")).to_have_attribute(
@@ -71,7 +70,9 @@ def test_navbar_user_avatar(live_server, user: User, page: Page):
     )
 
 
-def test_navbar_viewer_default_avatar(live_server, user: User, page: Page):
+def test_navbar_user_default_avatar(
+    live_server: LiveServer, user: User, page: Page
+) -> None:
     # when
     page.goto(live_server.url)
     # then
@@ -81,7 +82,7 @@ def test_navbar_viewer_default_avatar(live_server, user: User, page: Page):
 
 
 @pytest.fixture
-def user(live_server, page: Page, django_user_model):
+def user(live_server: LiveServer, page: Page, django_user_model: type[User]) -> User:
     password = "user"
     user = django_user_model.objects.create_user(username="user", password=password)
     page.goto(live_server.url + reverse("login"))
@@ -93,7 +94,9 @@ def user(live_server, page: Page, django_user_model):
     return user
 
 
-def test_login(live_server, page: Page, django_user_model):
+def test_login(
+    live_server: LiveServer, page: Page, django_user_model: type[User]
+) -> None:
     # given
     page.goto(live_server.url + reverse("login"))
 
@@ -109,7 +112,9 @@ def test_login(live_server, page: Page, django_user_model):
     expect(page).to_have_title("Forum")
 
 
-def test_duplicate_username(live_server, page: Page, django_user_model):
+def test_duplicate_username(
+    live_server: LiveServer, page: Page, django_user_model: type[User]
+) -> None:
     # given
     page.goto(live_server.url + reverse("register"))
 
@@ -127,7 +132,7 @@ def test_duplicate_username(live_server, page: Page, django_user_model):
     )
 
 
-def test_thread_create(live_server, page: Page, user):
+def test_thread_create(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     topic = SubTopic.objects.create(slug="general")
     page.goto(live_server.url + topic.get_absolute_url())
@@ -141,7 +146,7 @@ def test_thread_create(live_server, page: Page, user):
     assert Thread.objects.get().title == title
 
 
-def test_post_create(live_server, page: Page, user: User):
+def test_post_create(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     thread = Thread.objects.create(
         author=user,
@@ -162,7 +167,7 @@ def test_post_create(live_server, page: Page, user: User):
     assert Post.objects.get().thread == thread
 
 
-def test_post_create_preview(live_server, page: Page, user: User):
+def test_post_create_preview(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     thread = Thread.objects.create(
         author=user,
@@ -181,24 +186,26 @@ def test_post_create_preview(live_server, page: Page, user: User):
     assert Post.objects.count() == 0
 
 
-def test_bubble_user_avatar(live_server, page: Page, user: User):
+def test_bubble_user_avatar(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     thread = Thread.objects.create(
         author=user,
-        slug="user-thread",
         subtopic=SubTopic.objects.create(slug="general"),
     )
-    profile = Profile.objects.create(user=user, avatar="http://www.test.com/avatar.png")
-
+    avatar = "https://media.giphy.com/media/a6pzK009rlCak/giphy.gif"
+    user.avatar = avatar
+    user.save()
     # when
     page.goto(live_server.url + thread.get_absolute_url())
     # then
-    assert (
-        page.get_by_role("form").get_by_role("img").get_attribute("src")
-        == profile.avatar
+    expect(page.locator("#leave-a-comment").get_by_role("img")).to_have_attribute(
+        "src", avatar
     )
 
-def test_post_create_anonymous(live_server, page: Page, django_user_model):
+
+def test_post_create_anonymous(
+    live_server: LiveServer, page: Page, django_user_model: type[User]
+) -> None:
     # given
     thread = Thread.objects.create(
         author=django_user_model.objects.create_user(username="user"),
@@ -212,7 +219,9 @@ def test_post_create_anonymous(live_server, page: Page, django_user_model):
     ).to_have_count(1)
 
 
-def test_thread_create_anonymous(live_server, page: Page, django_user_model):
+def test_thread_create_anonymous(
+    live_server: LiveServer, page: Page, django_user_model: type[User]
+) -> None:
     # given
     topic = SubTopic.objects.create(slug="general")
     # when
@@ -223,7 +232,9 @@ def test_thread_create_anonymous(live_server, page: Page, django_user_model):
     ).to_have_count(1)
 
 
-def test_post_pagination_navigation(live_server, page: Page, user: User):
+def test_post_pagination_navigation(
+    live_server: LiveServer, page: Page, user: User
+) -> None:
     # given
     thread = Thread.objects.create(
         author=user,
@@ -239,7 +250,9 @@ def test_post_pagination_navigation(live_server, page: Page, user: User):
     expect(page).to_have_url(live_server.url + thread.get_absolute_url() + "?page=2")
 
 
-def test_post_pagination_initial(live_server, page: Page, user: User):
+def test_post_pagination_initial(
+    live_server: LiveServer, page: Page, user: User
+) -> None:
     # given
     thread = Thread.objects.create(
         author=user,
@@ -261,7 +274,7 @@ def test_post_pagination_initial(live_server, page: Page, user: User):
     expect(page.get_by_role("link", name="Go to last page")).to_have_count(2)
 
 
-def test_post_pagination(live_server, page: Page, user: User):
+def test_post_pagination(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     thread = Thread.objects.create(
         author=user,

@@ -49,11 +49,11 @@ class SubTopic(models.Model):
     def post_count(self):
         return self.thread_set.aggregate(Count("post"))["post__count"]
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         if self.topic == None:
-            return reverse("topic", kwargs={"topic": self.slug})
+            return reverse("topic", kwargs={"slug": self.slug})
 
-        return reverse("topic", kwargs={"topic": self.slug, "topic_pk": self.topic.pk})
+        return reverse("topic", kwargs={"slug": self.slug, "topic_pk": self.topic.pk})
 
 
 class Thread(models.Model):
@@ -65,7 +65,7 @@ class Thread(models.Model):
     def __str__(self) -> str:
         return f"{str(self.subtopic)}{self.pk}/"
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("thread", kwargs={"pk": self.pk})
 
 
@@ -82,7 +82,7 @@ class Post(models.Model):
     def __str__(self) -> str:
         return str(self.pk)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         posts: models.Manager[Post] = self.thread.post_set
         index = posts.filter(pk__lt=self.pk).count()
 
