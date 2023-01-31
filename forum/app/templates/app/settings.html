@@ -5,20 +5,27 @@
 {% load md%}
 <!--  -->
 {% block html %}
-<input type="checkbox" id="confirm-removal" class="modal-toggle" />
-<label for="confirm-removal" class="modal cursor-pointer">
-  <label class="modal-box relative" for="">
-    <h3 class="font-bold text-lg">Do you want to remove your account!</h3>
-    <p class="py-4">You will permanently lose access to your account.</p>
-    <form class="modal-action" method="post" action="{%url 'user-remove'%}">
+<input type="checkbox" id="confirm-deletion" class="modal-toggle" />
+<label for="confirm-deletion" class="modal cursor-pointer">
+  <label class="modal-box relative" for="" role="dialog">
+    <h3 class="font-bold text-lg">Are you absolutely sure?</h3>
+    <p class="py-4">
+      This action <strong>cannot</strong> be undone. You will permanently loose
+      access to your account.
+    </p>
+    <form class="modal-action" method="post" action="{%url 'user-delete'%}">
       {% csrf_token %}
-      <label for="confirm-removal" class="btn">No</label>
-      <label for="confirm-removal" class="btn btn-primary">
-        <button type="submit">Yes</button>
-      </label>
+      <button type="submit" class="btn btn-primary">Yes</button>
     </form>
   </label>
 </label>
+<script>
+  document.addEventListener("keydown", (e) => {
+    if (event.keyCode == 27) {
+      globalThis["confirm-deletion"].checked = false;
+    }
+  });
+</script>
 
 {% endblock %}
 <!--  -->
@@ -55,26 +62,43 @@
       </div>
 
       <div class="card bg-base-200">
-        <div class="card-body relative items-center">
-          <form method="POST">
-            {% csrf_token %} {{form.as_div}}
+        <div class="card-body">
+          <div class="card-title">Public profile</div>
 
-            <div class="form-control mt-6">
-              <button class="btn btn-primary" type="submit">
-                Update profile
-              </button>
+          <div class="flex justify-between">
+            <form method="POST">
+              {% csrf_token %} {{form.as_div}}
+
+              <div class="form-control mt-6">
+                <button class="btn btn-primary btn-wide" type="submit">
+                  Update profile
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <div class="card-title">Danger Zone</div>
+          <div class="flex flex-col md:flex-row gap-4 justify-between">
+            <div>
+              <div>Delete your account</div>
+              <div class="text-sm">
+                Once you delete your account, there is no going back. Please be
+                certain.
+              </div>
             </div>
-
-
-            <div class="form-control mt-24">
-              <label for="confirm-removal" class="btn btn-error"
-              >Remove account</label>
-            </div>
-          </form>
-
-        
-
-       
+            <label
+              onkeydown="if(event.keyCode === 13) this.control.checked = !this.control.checked"
+              for="confirm-deletion"
+              role="button"
+              tabindex="0"
+              aria-haspopup="dialog"
+              class="btn btn-error btn-wide"
+              >Delete</label
+            >
+          </div>
         </div>
       </div>
     </div>

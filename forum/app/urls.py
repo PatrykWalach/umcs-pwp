@@ -15,7 +15,7 @@ from app.views import (
     ThreadCloseView,
     ThreadView,
     TopicView,
-    UserRemoveView,
+    UserDeleteView,
     UserView,
 )
 from django.contrib import admin
@@ -47,7 +47,7 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path("", MainView.as_view(), name="main"),
     path("user/<str:slug>/", UserView.as_view(), name="user"),
-    path("user/", UserRemoveView, name="user-remove"),
+    path("user/", UserDeleteView, name="user-delete"),
     path(
         "search/", TemplateView.as_view(template_name="app/search.html"), name="search"
     ),
