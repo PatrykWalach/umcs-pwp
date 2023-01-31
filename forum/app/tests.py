@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+from cmath import exp
 from datetime import datetime
 from typing import Callable
 
@@ -9,7 +10,7 @@ import pytest
 from app.models import Post, SubTopic, Thread, User
 from django.urls import reverse
 from django.utils.text import slugify
-from django.utils.timezone import datetime
+from django.utils.timezone import datetime, now
 from playwright.sync_api import Page, expect
 from pytest_django.live_server_helper import LiveServer
 
@@ -18,7 +19,7 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 @pytest.fixture(autouse=True)
 def set_default_navigation_timeout(page: Page) -> None:
-    page.set_default_navigation_timeout(3000)
+    page.set_default_timeout(3000)
 
 
 def test_main_page_title(live_server: LiveServer, page: Page) -> None:
@@ -239,7 +240,7 @@ def test_user_delete(live_server: LiveServer, page: Page, user: User) -> None:
     ).to_have_count(1)
 
 
-def test_thread_lock(live_server: LiveServer, page: Page, user: User) -> None:
+def test_thread_close(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     user.is_staff = True
     user.save()
@@ -248,9 +249,22 @@ def test_thread_lock(live_server: LiveServer, page: Page, user: User) -> None:
     )
     page.goto(live_server.url + thread.get_absolute_url())
     # when
-    page.get_by_role("button", name="Lock").click()
+    page.get_by_role("button", name="Close thread").click()
     # then
     expect(page.get_by_text("This thread is now closed")).to_have_count(1)
+    expect(page.get_by_role("button", name="Close thread")).to_have_count(0)
+
+
+def test_thread_closed(live_server: LiveServer, page: Page, user: User) -> None:
+    # given
+    thread = Thread.objects.create(
+        author=user, subtopic=SubTopic.objects.create(slug="general"), closed_at=now()
+    )
+    # when
+    page.goto(live_server.url + thread.get_absolute_url())
+    # then
+    expect(page.get_by_text("This thread is now closed")).to_have_count(1)
+    expect(page.get_by_placeholder("Reply to the topic...")).to_have_count(0)
 
 
 def test_thread_create_anonymous(

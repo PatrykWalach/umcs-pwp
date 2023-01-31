@@ -30,12 +30,11 @@ T = typing.TypeVar("T", bound=Model)
 
 
 @staff_member_required
-def ThreadLockView(request: HttpRequest, pk: int) -> HttpResponse:
+def ThreadCloseView(request: HttpRequest, pk: int) -> HttpResponse:
     thread = get_object_or_404(Thread, pk=pk)
     if request.method == "POST":
-        thread.locked_at = now()
+        thread.closed_at = now()
         thread.save()
-        print(f"locked {thread.pk}")
 
     return redirect(thread.get_absolute_url())
 
@@ -49,7 +48,7 @@ def ThreadView(request: HttpRequest, pk: int) -> HttpResponse:
     if (
         request.method == "POST"
         and (form := CreatePostForm(request.POST)).is_valid()
-        and not thread.is_locked()
+        and not thread.is_closed()
     ):
         form.instance.author = request.user
         form.instance.thread = thread

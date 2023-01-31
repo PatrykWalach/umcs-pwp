@@ -89,7 +89,7 @@
 
       <div class="card card-compact bg-base-100">
         <div class="card-body">
-          {% if object.is_locked %}
+          {% if object.is_closed %}
           <div class="flex flex-col text-error items-center">
             <div class="card-title"> This thread is now closed to further replies.</div>
               <svg
@@ -151,13 +151,13 @@
         </div>
       </div>
 
-      {% if user.is_staff and not object.is_locked %}
+      {% if user.is_staff and not object.is_closed %}
       <div class="card card-compact bg-base-100">
         <div class="card-body items-end">
-          <form action="{%url 'thread-lock' object.pk %}" method="post">
+          <form action="{%url 'thread-close' object.pk %}" method="post">
             {% csrf_token %}
             <button class="btn btn-error btn-wide" type="submit">
-              Lock thread
+              Close thread
             </button>
           </form>
         </div>
