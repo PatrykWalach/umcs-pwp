@@ -8,6 +8,7 @@ import django.utils.timezone
 from app.forms import CreatePostForm, CreateThreadForm
 from app.models import Post, SubTopic, Thread, User
 from django import forms
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
@@ -18,6 +19,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.timezone import now, timedelta
 from django.views import View
 from django.views.generic import CreateView, FormView, ListView
 from django.views.generic.base import TemplateView
@@ -27,13 +29,28 @@ from django.views.generic.edit import UpdateView
 T = typing.TypeVar("T", bound=Model)
 
 
+@staff_member_required
+def ThreadLockView(request: HttpRequest, pk: int) -> HttpResponse:
+    thread = get_object_or_404(Thread, pk=pk)
+    if request.method == "POST":
+        thread.locked_at = now()
+        thread.save()
+        print(f"locked {thread.pk}")
+
+    return redirect(thread.get_absolute_url())
+
+
 def ThreadView(request: HttpRequest, pk: int) -> HttpResponse:
     thread = get_object_or_404(Thread, pk=pk)
     form = CreatePostForm(
         user=request.user, initial={"content": request.GET.get("content")}
     )
 
-    if request.method == "POST" and (form := CreatePostForm(request.POST)).is_valid():
+    if (
+        request.method == "POST"
+        and (form := CreatePostForm(request.POST)).is_valid()
+        and not thread.is_locked()
+    ):
         form.instance.author = request.user
         form.instance.thread = thread
         form.save()

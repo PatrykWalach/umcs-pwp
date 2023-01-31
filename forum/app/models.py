@@ -61,6 +61,10 @@ class Thread(models.Model):
     title = models.CharField(max_length=150)
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now=True)
+    locked_at = models.DateTimeField(null=True, default=None, blank=True)
+
+    def is_locked(self) -> bool:
+        return self.locked_at is not None and self.locked_at < now()
 
     def __str__(self) -> str:
         return f"{str(self.subtopic)}{self.pk}/"

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 from datetime import datetime
+from typing import Callable
 
 import pytest
 from app.models import Post, SubTopic, Thread, User
@@ -88,7 +89,6 @@ def user(live_server: LiveServer, page: Page, django_user_model: type[User]) -> 
     password = "user"
     user = django_user_model.objects.create_user(username="user", password=password)
     page.goto(live_server.url + reverse("login"))
-
     page.get_by_role("textbox", name="Username:").type(user.username)
     page.get_by_role("textbox", name="Password:").type(password)
     page.get_by_role("button", name="Login").click()
@@ -221,12 +221,12 @@ def test_post_create_anonymous(
     ).to_have_count(1)
 
 
-def test_user_remove(live_server: LiveServer, page: Page, user: User) -> None:
+def test_user_delete(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     page.goto(live_server.url + reverse("settings"))
-    page.get_by_text("Remove account").click()
+    page.get_by_role("button", name="Delete").click()
     # when
-    page.get_by_role("button", name="Yes").click()
+    page.get_by_role("dialog").get_by_role("button", name="Yes").click()
     # then
     page.goto(live_server.url + reverse("login"))
     page.get_by_role("textbox", name="Username:").type(user.username)
@@ -237,6 +237,20 @@ def test_user_remove(live_server: LiveServer, page: Page, user: User) -> None:
             "Please enter a correct username and password. Note that both fields may be case-"
         )
     ).to_have_count(1)
+
+
+def test_thread_lock(live_server: LiveServer, page: Page, user: User) -> None:
+    # given
+    user.is_staff = True
+    user.save()
+    thread = Thread.objects.create(
+        author=user, subtopic=SubTopic.objects.create(slug="general")
+    )
+    page.goto(live_server.url + thread.get_absolute_url())
+    # when
+    page.get_by_role("button", name="Lock").click()
+    # then
+    expect(page.get_by_text("This thread is now closed")).to_have_count(1)
 
 
 def test_thread_create_anonymous(

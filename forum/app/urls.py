@@ -12,6 +12,7 @@ from app.models import Post, SubTopic, Thread
 from app.views import (
     MainView,
     SettingsView,
+    ThreadLockView,
     ThreadView,
     TopicView,
     UserRemoveView,
@@ -66,5 +67,10 @@ urlpatterns = [
         "thread/<int:pk>/",
         ThreadView,
         name="thread",
+    ),
+    path(
+        "thread/<int:pk>/lock/",
+        ThreadLockView,
+        name="thread-lock",
     ),
 ]
