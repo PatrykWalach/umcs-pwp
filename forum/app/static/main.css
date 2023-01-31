@@ -2948,14 +2948,44 @@ html {
   border-radius: var(--rounded-btn, 0.5rem);
 }
 
+.\!input {
+  flex-shrink: 1 !important;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter !important;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter !important;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter !important;
+  transition-duration: 200ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  height: 3rem !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  font-size: 1rem !important;
+  line-height: 2 !important;
+  line-height: 1.5rem !important;
+  border-width: 1px !important;
+  border-color: hsl(var(--bc) / var(--tw-border-opacity)) !important;
+  --tw-border-opacity: 0 !important;
+  --tw-bg-opacity: 1 !important;
+  background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
+  border-radius: var(--rounded-btn, 0.5rem) !important;
+}
+
 .input-group > .input {
   isolation: isolate;
+}
+
+.input-group > .\!input {
+  isolation: isolate !important;
 }
 
 .input-group > *,
   .input-group > .input,
   .input-group > .select {
   border-radius: 0px;
+}
+
+
+  .input-group > .\!input {
+  border-radius: 0px !important;
 }
 
 .kbd {
@@ -3913,6 +3943,10 @@ html {
   line-height: 1em;
 }
 
+.\!input[list]::-webkit-calendar-picker-indicator {
+  line-height: 1em !important;
+}
+
 .input-bordered {
   --tw-border-opacity: 0.2;
 }
@@ -3920,6 +3954,11 @@ html {
 .input:focus {
   outline: 2px solid hsla(var(--bc) / 0.2);
   outline-offset: 2px;
+}
+
+.\!input:focus {
+  outline: 2px solid hsla(var(--bc) / 0.2) !important;
+  outline-offset: 2px !important;
 }
 
 .input-disabled,
@@ -3932,6 +3971,16 @@ html {
   --tw-text-opacity: 0.2;
 }
 
+
+  .\!input[disabled] {
+  cursor: not-allowed !important;
+  --tw-border-opacity: 1 !important;
+  border-color: hsl(var(--b2, var(--b1)) / var(--tw-border-opacity)) !important;
+  --tw-bg-opacity: 1 !important;
+  background-color: hsl(var(--b2, var(--b1)) / var(--tw-bg-opacity)) !important;
+  --tw-text-opacity: 0.2 !important;
+}
+
 .input-disabled::-moz-placeholder, .input[disabled]::-moz-placeholder {
   color: hsl(var(--bc) / var(--tw-placeholder-opacity));
   --tw-placeholder-opacity: 0.2;
@@ -3941,6 +3990,18 @@ html {
   .input[disabled]::placeholder {
   color: hsl(var(--bc) / var(--tw-placeholder-opacity));
   --tw-placeholder-opacity: 0.2;
+}
+
+
+  .\!input[disabled]::-moz-placeholder {
+  color: hsl(var(--bc) / var(--tw-placeholder-opacity)) !important;
+  --tw-placeholder-opacity: 0.2 !important;
+}
+
+
+  .\!input[disabled]::placeholder {
+  color: hsl(var(--bc) / var(--tw-placeholder-opacity)) !important;
+  --tw-placeholder-opacity: 0.2 !important;
 }
 
 .link-secondary {
@@ -4763,10 +4824,6 @@ html {
   margin-top: 1.5rem;
 }
 
-.mt-24 {
-  margin-top: 6rem;
-}
-
 .block {
   display: block;
 }
@@ -4938,10 +4995,6 @@ html {
   justify-content: space-between;
 }
 
-.justify-around {
-  justify-content: space-around;
-}
-
 .justify-evenly {
   justify-content: space-evenly;
 }
@@ -4960,14 +5013,6 @@ html {
 
 .gap-4 {
   gap: 1rem;
-}
-
-.gap-16 {
-  gap: 4rem;
-}
-
-.gap-24 {
-  gap: 6rem;
 }
 
 .-space-x-5 > :not([hidden]) ~ :not([hidden]) {
@@ -5100,6 +5145,11 @@ html {
   line-height: 1;
 }
 
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -5108,11 +5158,6 @@ html {
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
-}
-
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
 }
 
 .font-bold {
@@ -5270,6 +5315,10 @@ html {
 
   .md\:grid-cols-\[200px_1fr\] {
     grid-template-columns: 200px 1fr;
+  }
+
+  .md\:flex-row {
+    flex-direction: row;
   }
 
   .md\:gap-8 {

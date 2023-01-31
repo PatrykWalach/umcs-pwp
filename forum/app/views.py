@@ -100,7 +100,7 @@ class MainView(ListView):
     queryset = SubTopic.objects.filter(topic__topic=None, topic__isnull=False)
 
 
-def UserRemoveView(request: HttpRequest) -> HttpResponse:
+def UserDeleteView(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         request.user.is_active = False
         request.user.save()

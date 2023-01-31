@@ -221,12 +221,12 @@ def test_post_create_anonymous(
     ).to_have_count(1)
 
 
-def test_user_remove(live_server: LiveServer, page: Page, user: User) -> None:
+def test_user_delete(live_server: LiveServer, page: Page, user: User) -> None:
     # given
     page.goto(live_server.url + reverse("settings"))
-    page.get_by_text("Remove account").click()
+    page.get_by_role("button", name="Delete").click()
     # when
-    page.get_by_role("button", name="Yes").click()
+    page.get_by_role("dialog").get_by_role("button", name="Yes").click()
     # then
     page.goto(live_server.url + reverse("login"))
     page.get_by_role("textbox", name="Username:").type(user.username)

@@ -11,7 +11,7 @@
       {% if field.label %}{{ field.label_tag }}{% endif %}
     {% endif %}
     
-    {% if field.help_text %}<div class="tooltip tooltip-bottom md:tooltip-right" data-tip="{{ field.help_text|safe }}">{% endif %}
+    {% if field.help_text %}<div class="tooltip grid tooltip-bottom md:tooltip-right" data-tip="{{ field.help_text|safe }}">{% endif %}
       {{ field }}
     {% if field.help_text %}</div>{% endif %}
       {{ errors }}     
