@@ -44,7 +44,7 @@ class CreatePostForm(forms.ModelForm):
 class CreateThreadForm(forms.ModelForm):
     class Meta:
         model = Thread
-        exclude = ["author", "subtopic"]
+        fields = ["title"]
         # labels = {"content": ""}
         widgets = {
             # "author": forms.HiddenInput(),

@@ -12,15 +12,14 @@
 
 <main class="bg-base-200">
   <div class="container mx-auto md:px-24">
-    <div class="bg-base-100/30 flex flex-col min-h-[calc(100vh-66px)] p-8 gap-4">
+    <div
+      class="bg-base-100/30 flex flex-col min-h-[calc(100vh-66px)] p-8 gap-4"
+    >
       <div class="text-sm breadcrumbs mx-8">
         <ul>
           {% for topic in object.subtopic.path %}
           <li>
-            <a
-              href="{{ topic.get_absolute_url }}"
-              >{{topic.name}}</a
-            >
+            <a href="{{ topic.get_absolute_url }}">{{topic.name}}</a>
           </li>
           {% endfor %}
 
@@ -30,12 +29,9 @@
 
       {% if paginator.num_pages > 1 %}
 
-          <div class="justify-center flex">
+      <div class="justify-center flex">{% include 'pagination.html' %}</div>
 
-            {% include 'pagination.html' %}
-          </div>
-
-      {% endif %} 
+      {% endif %}
 
       <section class="card bg-base-100">
         <div class="card-body">
@@ -47,13 +43,20 @@
             <div class="avatar">
               <div class="w-12 rounded-full">
                 <a href="{{object.author.get_absolute_url}}" class="contents">
-                <img src="{{object.author.avatar|default:avatar}}" />
-              </a>
+                  <img src="{{object.author.avatar|default:avatar}}" />
+                </a>
               </div>
             </div>
             <div>
               <div>
-                <strong>By <a href="{{object.author.get_absolute_url}}" class="link link-hover">{{ object.author.username }}</a></strong>
+                <strong
+                  >By
+                  <a
+                    href="{{object.author.get_absolute_url}}"
+                    class="link link-hover"
+                    >{{ object.author.username }}</a
+                  ></strong
+                >
               </div>
               {% load humanize %}
               <time datetime="{{object.created_at|date:'c'}}"
@@ -61,7 +64,7 @@
               >
               in
               <a
-              class="link link-hover"
+                class="link link-hover"
                 href="{{object.subtopic.get_absolute_url}}"
                 >{{object.subtopic.name}}</a
               >
@@ -72,40 +75,43 @@
       {% for post in object_list %}
 
       <div class="card bg-base-100" id="post-{{post.pk}}">
-        <div class="card-body">
-          {% include 'post.html' with post=post %}
-        </div>
+        <div class="card-body">{% include 'post.html' with post=post %}</div>
       </div>
-      {% endfor %} 
-      
-      
-      {% if paginator.num_pages > 1 %}
+      {% endfor %} {% if paginator.num_pages > 1 %}
 
-
-          <div class="justify-center flex">
-            {% include 'pagination.html' %}
-          </div>
+      <div class="justify-center flex">{% include 'pagination.html' %}</div>
 
       {% endif %} {% if form.content.value %}
       <div id="preview" class="card bg-neutral text-neutral-content">
-        <div class="card-body">
-          {% include 'post.html' with post=preview %}
-        </div>
+        <div class="card-body">{% include 'post.html' with post=preview %}</div>
       </div>
       {% endif %}
 
- 
-
-
       <div class="card card-compact bg-base-100">
         <div class="card-body">
-          {% if user.is_authenticated %}
+          {% if object.is_closed %}
+          <div class="flex flex-col text-error items-center">
+            <div class="card-title"> This thread is now closed to further replies.</div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                />
+              </svg>
+           
+       
+          </div>
+          {% elif user.is_authenticated %}
 
-          <form
-            action="#leave-a-comment"
-            id="leave-a-comment"
-            method="POST"
-          >
+          <form action="#leave-a-comment" id="leave-a-comment" method="POST">
             {% csrf_token %} {{form.as_div}}
 
             <div>
@@ -144,6 +150,19 @@
           {% endif %}
         </div>
       </div>
+
+      {% if user.is_staff and not object.is_closed %}
+      <div class="card card-compact bg-base-100">
+        <div class="card-body items-end">
+          <form action="{%url 'thread-close' object.pk %}" method="post">
+            {% csrf_token %}
+            <button class="btn btn-error btn-wide" type="submit">
+              Close thread
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </main>
