@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+
+<h1>
+    Ksiazka nr {{book.id}}</h1>
+-------------<br>
+Id: {{book.id}}<br>
+Autor: {{book.author}}<br>
+Tytuł: {{book.title}}<br>
+Data dodania: {{book.created_at}}<br>
+-------------<br>
+
+<aside style="display: flex;">
+
+    <form method="post">{% csrf_token %}<input type="hidden" name="index" value="{{prev_index}}">
+        <button {% if not has_prev %} disabled {% endif %} type="submit"><</button>
+    </form>
+
+
+    <form method="post">{% csrf_token %}<input type="hidden" name="index" value="{{next_index}}">
+        <button {% if not has_next %} disabled {% endif %} type="submit">></button>
+    </form>
+
+</aside>
+
+{% endblock %}
