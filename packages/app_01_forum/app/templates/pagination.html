@@ -1,0 +1,37 @@
+<div class="btn-group">
+  {% if page_obj.number > 1 %}
+  <div class="tooltip" data-tip="First page">
+    <a
+      class="btn btn-ghost rounded-r-none"
+      href="?page=1"
+      aria-label="Go to first page"
+      >«</a
+    >
+  </div>
+  <!-- <div class="tooltip" data-tip="Previous page">
+  <a   class="btn" href="?page={{ page|add:'-1' }}">PREV</a>
+</div> -->
+  {% endif %}
+  <!--  -->
+  {% for page in paginator.page_range %} {% if  page_obj.number|add:"-5" <= page and page <= page_obj.number|add:"5"  %}
+  <a
+    aria-label="Go to page {{page}}"
+    href="?page={{page}}"
+    class="btn btn-ghost {% if page_obj.number == page %} btn-active {% endif %}"
+  >
+    {{page}}
+  </a>
+  {% endif %} {% endfor %} {% if page_obj.number < paginator.num_pages %}
+  <!-- <div class="tooltip" data-tip="Next page">
+  <a   class="btn" href="?page={{ page_info.page|add:'1' }}">NEXT</a>
+</div> -->
+  <div class="tooltip" data-tip="Last page">
+    <a
+      class="btn btn-ghost rounded-l-none"
+      href="?page={{paginator.num_pages}}"
+      aria-label="Go to last page"
+      >»</a
+    >
+  </div>
+  {% endif %}
+</div>

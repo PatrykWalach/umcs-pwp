@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %} Main Page {% endblock %}
+{% block main %}
+
+Go to: <a href="{% url 'priva1' %}">Priva Page 1</a><br>
+Go to: <a href="{% url 'priva2' %}">Priva Page 2</a><br>
+
+{% if user.is_authenticated %}
+ Hi {{ user.username }}!
+ <p><a href="{% url 'logout' %}">logout</a></p>
+{% else %}
+ <p>You are not logged in</p>
+ <a href="{% url 'login' %}">login</a><br>
+ <a href="{% url 'signup' %}">rejestruj</a>
+{% endif %}
+{% endblock %}

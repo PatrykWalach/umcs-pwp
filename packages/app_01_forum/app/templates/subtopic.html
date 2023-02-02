@@ -1,0 +1,29 @@
+{% load humanize %}
+ 
+  <div>
+    <div class="flex gap-2 items-center text-xl">
+      <a href="{{ subtopic.get_absolute_url }}" class="link link-hover"
+        >{{subtopic.name}}</a
+      >{% if not topic.new and subtopic.new %}
+      <div class="hidden md:flex badge badge-secondary badge-sm">NEW</div>
+      {% endif %}
+    </div>
+    <div class="text-xs">
+      {% if subtopic.subtopic_set.count > 0 %}
+      <ul class="flex list-disc list-inside flex-wrap gap-2">
+        {% for subtopic in subtopic.subtopic_set.all %}
+        <li class="">
+          <a class="link link-hover" href="{{ subtopic.get_absolute_url }}"
+            >{{subtopic.name}}</a
+          >
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %} {{subtopic.description}} {% endif %}
+    </div>
+  </div>
+
+ 
+ 
+ 
+ 

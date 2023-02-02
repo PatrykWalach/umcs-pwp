@@ -1,0 +1,9 @@
+http://example.com:80/path/to/myfile.html?key1=value1&key2=value2#SomewhereInTheDocument
+protsy ze sieżką http://back.example.org/border/activity.html
+z parametrami i ścieżką https://www.example.com/action?battle=board
+z parametrami i ścieżką https://example.com/over/there?name=ferret
+parametry http://example.net/advertisement.aspx?book=bee
+prosty https://example.com/
+prosty ze ścieżką http://example.com/basin.html
+przykład http://example.com/#birth
+wyszukiwarka https://www.google.pl/search?q=python&source=hp
